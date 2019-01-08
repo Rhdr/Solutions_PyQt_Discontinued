@@ -1,0 +1,34 @@
+<RCC>
+  <qresource prefix="mdiToobar">
+    <file>icons/windows.png</file>
+    <file>icons/tabs.png</file>
+  </qresource>
+  <qresource prefix="navigation">
+    <file>icons/GoToFirstRecord.png</file>
+    <file>icons/GoToLastRecord.png</file>
+    <file>icons/GoToNextRecord.png</file>
+    <file>icons/GoToPrevRecord.png</file>
+  </qresource>
+  <qresource prefix="CRUD_S">
+    <file>icons/addNewRecord.png</file>
+    <file>icons/deleteRecord.png</file>
+    <file>icons/openRecord.png</file>
+    <file>icons/save.png</file>
+    <file>icons/search.png</file>
+    <file>icons/searchClear.png</file>
+  </qresource>
+  <qresource prefix="applicationIcon">
+    <file>icons/exit.png</file>
+    <file>icons/signout.png</file>
+    <file>icons/Home.png</file>
+  </qresource>
+  <qresource prefix="mainMenu">
+    <file>icons/maintenance.png</file>
+    <file>icons/documentation.png</file>
+    <file>icons/finances.png</file>
+    <file>icons/inspections.png</file>
+    <file>icons/marketing.png</file>
+    <file>icons/people.png</file>
+    <file>icons/property.png</file>
+  </qresource>
+</RCC>

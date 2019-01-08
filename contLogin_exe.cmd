@@ -1,0 +1,2 @@
+C:\Python36\Scripts\PyInstaller.exe --noconsole --paths=C:\Python36\Lib\site-packages\PyQt5\Qt\bin --paths=c:\python36\p --paths=C:\python36\lib\site-packages\PyQt5\Qt\plugins\platforms\ --paths=C:\python36\lib\site-packages\PyQt5\Qt\plugins\imageformats contLogin.py
+pause

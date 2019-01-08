@@ -1,0 +1,1 @@
+C:\Python36\Scripts\pyuic5 -x viewEntitySearch.ui -o viewEntitySearch.pyw

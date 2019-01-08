@@ -1,0 +1,1 @@
+Remeber to copy the icons_rc.pyw to the mainwindow folder
