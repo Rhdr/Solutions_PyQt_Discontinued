@@ -1,7 +1,9 @@
 from PyQt5 import QtWidgets, QtCore
 import views.viewEntitySearch
 import views.viewEntity
+import controllers.conInsertRecord
 import models.modelEntity
+import models.modelTestTable
 import utilityClasses.delegates
 
 class ContEntity(QtWidgets.QMainWindow):
@@ -11,17 +13,15 @@ class ContEntity(QtWidgets.QMainWindow):
         self.__ui.setupUi(self)
 
         #app.aboutToQuit.connect(self.closeEvent)
-        self.__clsModelEntity = models.modelEntity.ModelEntity()
-        self.__clsModelEntity.connect()     #ensure db connection is created
-        self.__model = self.__clsModelEntity.getModel()
+        self.__modelInterface = models.modelTestTable.ModelEntityInterface()
+        self.__model = self.__modelInterface.getModel()
         self.__ui.toolbCrud.addWidget(self.__ui.txtSearch)
         self.__ui.toolbCrud.addAction(self.__ui.actionFind)
         self.__ui.toolbCrud.addAction(self.__ui.actionDelete)
-        self.__ui.tableView.horizontalHeader().sortIndicatorChanged.connect(self.__model.orderBy)
-        #self.__ui.txtSearch.textChanged.connect(self.__proxyModel.setFilterRegExp)
+        #self.__ui.tableView.horizontalHeader().sortIndicatorChanged.connect(self.__model.orderBy)
 
-        self.__ui.txtSearch.returnPressed.connect(lambda: self.__clsModelEntity.search(self.__ui.txtSearch.text()))
-        self.__ui.actionFind.triggered.connect(lambda: self.__clsModelEntity.search(self.__ui.txtSearch.text()))
+        self.__ui.txtSearch.returnPressed.connect(lambda: self.__modelInterface.search(self.__ui.txtSearch.text()))
+        self.__ui.actionFind.triggered.connect(lambda: self.__modelInterface.search(self.__ui.txtSearch.text()))
 
         #setup tableView & hide pk
         self.__ui.tableView.setModel(self.__model)
@@ -30,7 +30,7 @@ class ContEntity(QtWidgets.QMainWindow):
         self.__tableViewSelectionModel.currentRowChanged.connect(lambda: self.__model.rowChanged(self.__tableViewSelectionModel.currentIndex().row()))
 
         self.__tableViewSelectionModel.currentRowChanged.connect(self.rowChanged)
-        self.__ui.tableView.installEventFilter(self) #install event filter to catch on focus event
+        #self.__ui.tableView.installEventFilter(self)
         self.__ui.tableView.hideColumn(0)
 
         #setup & link delegates
@@ -50,6 +50,7 @@ class ContEntity(QtWidgets.QMainWindow):
         self.__ui.actionNext.triggered.connect(self.actionNext)
         self.__ui.actionLast.triggered.connect(self.actionLast)
 
+    '''
     def eventFilter(self, object, event):
         #print(event.type())
         if event.type() == QtCore.QEvent.FocusOut:
@@ -62,7 +63,7 @@ class ContEntity(QtWidgets.QMainWindow):
             #print("Escape Pressed")
             self.__model.escapePressed(self.__ui.tableView.currentIndex().row())
             return True
-
+        
         if event.type() == QtCore.QEvent.KeyPress and event.key() == QtCore.Qt.Key_Tab:
             #attempt to catch & handle the tab key (prevent tab from jumping to first record when adding new rows)
             currentRow = self.__ui.tableView.currentIndex().row()
@@ -79,6 +80,7 @@ class ContEntity(QtWidgets.QMainWindow):
             else:
                 return False    #go ahead
         return False
+    '''
 
     def rowChanged(self, current = None, previous = None):
         #update view recordNr
@@ -88,9 +90,13 @@ class ContEntity(QtWidgets.QMainWindow):
 
     def actionAdd(self):
         #add new row to bottom of table
-        self.actionPrev()
-        #self.__model.insertRow()
-        self.__ui.tableView.selectRow(self.__model.rowCount() - 1)
+        contInsertRecord = controllers.conInsertRecord.ContInsertRecord(self.__modelInterface , self)
+        contInsertRecord.show()
+
+
+        #self.__modelInterface.insertRow()
+        #self.actionLast()
+        #self.__ui.tableView.scrollToBottom()
 
     def actionDelete(self):
         #check if there is a selection, get user confirmation & delete
@@ -131,7 +137,7 @@ class ContEntity(QtWidgets.QMainWindow):
 
     def actionLast(self):
         #last record may be blank used to add more records
-        self.__ui.tableView.selectRow(self.__model.rowCount() - 2)
+        self.__ui.tableView.selectRow(self.__model.rowCount() - 1)
 
     def closeEvent(self, event):
         print("closing")
@@ -146,7 +152,6 @@ def except_hook(cls, exception, traceback):
 if __name__ == "__main__":
     import sys
     sys.excepthook = except_hook
-    #logging.basicConfig(level = 'INFO', propagate = True)
 
     app = QtWidgets.QApplication(sys.argv)
     p = QtWidgets.QWidget()
