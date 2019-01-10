@@ -1,6 +1,9 @@
 from PyQt5 import QtWidgets, QtCore
 
 class LineEditDelegate(QtWidgets.QStyledItemDelegate):
+    #def __init__(self, parent):
+    #    super(LineEditDelegate, self).__init__(parent)
+
     def createEditor(self, QWidget, QStyleOptionViewItem, QModelIndex):
         return QtWidgets.QLineEdit(QWidget)
 

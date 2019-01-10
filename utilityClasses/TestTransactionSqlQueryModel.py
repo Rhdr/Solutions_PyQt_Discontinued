@@ -285,6 +285,9 @@ class TransactionSqlQueryModel_NewRecord(QtSql.QSqlQueryModel):
         self.__headers = headersLst
         self.__db = db
         self.__dirty = False
+        self.__newRowCount = 1
+        self.__dirtyRecord = QtSql.QSqlRecord()
+
         self.setQuery(selectQ)
 
     def data(self, index, role):
@@ -297,7 +300,10 @@ class TransactionSqlQueryModel_NewRecord(QtSql.QSqlQueryModel):
 
         if role == QtCore.Qt.DisplayRole:
             #displayed data for each cell
-            return super(TransactionSqlQueryModel_NewRecord, self).data(index, role)
+            if self.rowCountActual() == index.row():
+                return self.__dirtyRecord.field(index.column()).value()
+            else:
+                return super(TransactionSqlQueryModel_NewRecord, self).data(index, role)
 
     def setData(self, index, value, role=None):
         #cach any user changes to self.__dirtyRecord & mark as dirty
@@ -319,7 +325,10 @@ class TransactionSqlQueryModel_NewRecord(QtSql.QSqlQueryModel):
                     return "Incorrect header count, there should be " + str(self.columnCount() + " headers")
             else:
                 # rows labels
-                return pos + 1
+                if pos <= self.rowCountActual() - 1:
+                    return pos + 1
+                else:
+                    return "*"
 
     def __updateDirtyRecord(self):
         #save a copy for the current index record into a temp record called __dirtyRecord
@@ -327,13 +336,22 @@ class TransactionSqlQueryModel_NewRecord(QtSql.QSqlQueryModel):
         print("count:", self.__dirtyRecord.count())
 
     def rowChanged(self, newRowIndex):
-        #save record & record nr/index on rowchange, controllers need to connect their models to the rowChanged method
+        #save record & record nr/index on rowchange, controllers need to connect their views to the rowChanged method
         self.__updateDirtyRecord()
-        #self.save()
-        print("Implement Save...")
+        self.save()
 
     def requery(self):
         super(TransactionSqlQueryModel_NewRecord, self).setQuery(self.query().lastQuery())
+
+    def insertNewBlankRows(self, amount):
+        self.__newRowCount += amount
+        self.layoutChanged.emit()
+
+    def removeNewBlankRows(self, amount):
+        self.__newRowCount -= amount
+        if self.__newRowCount < 1:
+            self.__newRowCount = 1
+        self.layoutChanged.emit()
 
     def insertRow(self, appQueryDefaultRecord, parent = QtCore.QModelIndex()):
         rows = 1
@@ -364,6 +382,13 @@ class TransactionSqlQueryModel_NewRecord(QtSql.QSqlQueryModel):
             self.__colors.pop(pos)
         self.endRemoveRows()
         return True
+
+    def rowCount(self, parent = None):
+        #return extra row count + 1 if inserting a row
+        return self.rowCountActual() + self.__newRowCount
+
+    def rowCountActual(self):
+        return super(TransactionSqlQueryModel_NewRecord, self).rowCount()
 
     def save(self):
         print("Save not yet implemented")

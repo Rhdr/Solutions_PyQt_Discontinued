@@ -11,7 +11,6 @@ class ContEntity(QtWidgets.QMainWindow):
         QtWidgets.QMainWindow.__init__(self, parent)
         self.__ui = views.viewEntity.Ui_MainWindow()
         self.__ui.setupUi(self)
-        self.__dirtyRow = -1
 
         #app.aboutToQuit.connect(self.closeEvent)
         self.__modelInterface = models.modelTestTable.ModelEntityInterface()
@@ -28,23 +27,17 @@ class ContEntity(QtWidgets.QMainWindow):
         self.__ui.tableView.setModel(self.__model)
 
         self.__tableViewSelectionModel = self.__ui.tableView.selectionModel()
-        #self.__tableViewSelectionModel.currentRowChanged.connect(lambda: self.__model.rowChanged(self.__tableViewSelectionModel.currentIndex().row()))
+        self.__tableViewSelectionModel.currentRowChanged.connect(lambda: self.__model.rowChanged(self.__tableViewSelectionModel.currentIndex().row()))
 
         self.__tableViewSelectionModel.currentRowChanged.connect(self.rowChanged)
-        self.__ui.tableView.installEventFilter(self)
+        #self.__ui.tableView.installEventFilter(self)
         self.__ui.tableView.hideColumn(0)
 
         #setup & link delegates
         lineEditDelegate = utilityClasses.delegates.LineEditDelegate(self.__ui.tableView)
         spinBoxDelegate = utilityClasses.delegates.SpinBoxDelegate(self.__ui.tableView)
         self.__ui.tableView.setItemDelegateForColumn(1, lineEditDelegate)
-        self.__ui.tableView.setItemDelegateForColumn(2, lineEditDelegate)
-        self.__ui.tableView.setItemDelegateForColumn(3, lineEditDelegate)
-        self.__ui.tableView.setItemDelegateForColumn(4, lineEditDelegate)
         self.__ui.tableView.setItemDelegateForColumn(5, spinBoxDelegate)
-
-        #spinBoxDelegate.commitData.connect(self.delegateCommitData)
-        #lineEditDelegate.commitData.connect(self.delegateCommitData)
 
         #connect crud
         self.__ui.actionNewRecord.triggered.connect(self.actionAdd)
@@ -58,33 +51,14 @@ class ContEntity(QtWidgets.QMainWindow):
         self.__ui.actionLast.triggered.connect(self.actionLast)
 
     '''
-    def delegateCommitData(self):
-        print("delegateCommitData")
-        i = self.__tableViewSelectionModel.currentIndex()
-        print(i.column(), self.__model.columnCount()-1)
-        if i.row() == self.__model.rowCount() - 1:
-                print(self.__dirtyRow, i.row())
-                if self.__dirtyRow != -1 and self.__dirtyRow != i.row():
-                    #append
-                    print("append")
-                    #pass
-                self.__dirtyRow = i.row()
-                self.__model.insertNewBlankRows(1)
-    '''
     def eventFilter(self, object, event):
-        pass
-        '''
-        #print(object, event)
-        if event.type() == QtCore.QEvent.InputMethodQuery:
+        #print(event.type())
+        if event.type() == QtCore.QEvent.FocusOut:
             #catch the on focus event
-            i = self.__tableViewSelectionModel.currentIndex()
-            if i.row() == self.__model.rowCount() - 1:
-                self.__model.insertNewBlankRows(1)
-                print("inserted blank")
-            print("")
-        return True
-        '''
-        '''
+            # on editing the new row have the model insert another new row
+            self.__model.insertRow(self.__ui.tableView.currentIndex().row())
+            return True
+
         if event.type() == QtCore.QEvent.KeyPress and event.key() == QtCore.Qt.Key_Escape:
             #print("Escape Pressed")
             self.__model.escapePressed(self.__ui.tableView.currentIndex().row())
@@ -105,35 +79,24 @@ class ContEntity(QtWidgets.QMainWindow):
                 return True     #stop
             else:
                 return False    #go ahead
-        '''
         return False
-
+    '''
 
     def rowChanged(self, current = None, previous = None):
-        #signal model on rowchange to initiate a save
-        #update view recordNr lable
-        #on last row add new blank row
-
-        #print("rowchanged")
-
-        #signal model that the row changed
-        self.__model.rowChanged(self.__tableViewSelectionModel.currentIndex().row())
-
-        #update recordNr
+        #update view recordNr
         currentRow = str(self.__tableViewSelectionModel.currentIndex().row() + 1)
         rowCount = str(self.__model.rowCount())
         self.__ui.actionRecordNr.setText("Record " + currentRow + " of " + rowCount)
 
-        #add new blank row
-        i = self.__tableViewSelectionModel.currentIndex()
-        if i.row() == self.__model.rowCount() - 1:
-            self.__model.insertNewBlankRows(1)
-
     def actionAdd(self):
         #add new row to bottom of table
-        self.__model.insertNewBlankRows(1)
-        self.actionLast()
-        self.__ui.tableView.scrollToBottom()
+        contInsertRecord = controllers.conInsertRecord.ContInsertRecord(self.__modelInterface , self)
+        contInsertRecord.show()
+
+
+        #self.__modelInterface.insertRow()
+        #self.actionLast()
+        #self.__ui.tableView.scrollToBottom()
 
     def actionDelete(self):
         #check if there is a selection, get user confirmation & delete
@@ -196,3 +159,6 @@ if __name__ == "__main__":
     c.show()
 
     sys.exit(app.exec_())
+
+
+
