@@ -29,10 +29,10 @@ class ContEntity(QtWidgets.QMainWindow):
 
         self.__tableViewSelectionModel = self.__ui.tableView.selectionModel()
         #self.__tableViewSelectionModel.currentRowChanged.connect(lambda: self.__model.rowChanged(self.__tableViewSelectionModel.currentIndex().row()))
-
         self.__tableViewSelectionModel.currentRowChanged.connect(self.rowChanged)
         self.__ui.tableView.installEventFilter(self)
         self.__ui.tableView.hideColumn(0)
+        self.__ui.tableView.rowsInserted.connect(self.actionLast)
 
         #setup & link delegates
         lineEditDelegate = utilityClasses.delegates.LineEditDelegate(self.__ui.tableView)
@@ -49,7 +49,6 @@ class ContEntity(QtWidgets.QMainWindow):
         #connect crud
         self.__ui.actionNewRecord.triggered.connect(self.actionAdd)
         self.__ui.actionDelete.triggered.connect(self.actionDelete)
-        self.__ui.actionSave.triggered.connect(self.actionSave)
 
         #connect nav
         self.__ui.actionFirst.triggered.connect(self.actionFirst)
@@ -117,7 +116,8 @@ class ContEntity(QtWidgets.QMainWindow):
         #print("rowchanged")
 
         #signal model that the row changed
-        self.__model.rowChanged(self.__tableViewSelectionModel.currentIndex().row())
+        r = self.__tableViewSelectionModel.currentIndex().row()
+        self.__model.rowChanged(r)
 
         #update recordNr
         currentRow = str(self.__tableViewSelectionModel.currentIndex().row() + 1)
@@ -125,13 +125,13 @@ class ContEntity(QtWidgets.QMainWindow):
         self.__ui.actionRecordNr.setText("Record " + currentRow + " of " + rowCount)
 
         #add new blank row
-        i = self.__tableViewSelectionModel.currentIndex()
-        if i.row() == self.__model.rowCount() - 1:
-            self.__model.insertNewBlankRows(1)
+        #if r == self.__model.rowCount() - 1:
+        if r == self.__model.rowCountActual():
+            self.__model.insertNewBlankRows()
 
     def actionAdd(self):
         #add new row to bottom of table
-        self.__model.insertNewBlankRows(1)
+        self.__model.insertNewBlankRows()
         self.actionLast()
         self.__ui.tableView.scrollToBottom()
 
@@ -160,9 +160,6 @@ class ContEntity(QtWidgets.QMainWindow):
                                            QtWidgets.QMessageBox.Ok, self)
             msgbox.exec_()
 
-    def actionSave(self):
-        self.__model.save()
-
     def actionFirst(self):
         self.__ui.tableView.selectRow(0)
 
@@ -178,8 +175,7 @@ class ContEntity(QtWidgets.QMainWindow):
 
     def closeEvent(self, event):
         print("closing")
-        self.actionPrev()
-        self.actionSave()
+        self.__model.save(self.__tableViewSelectionModel.currentIndex().row())
         #event.iqnore()
 
 

@@ -5,24 +5,28 @@ import utilityClasses.TestTransactionSqlQueryModel
 class ModelEntityInterface(models._databaseConnection.DBConnection):
     def __init__(self):
         self.connect()
+        headers = ["Pk_EntityID", "Name", "Surname", "Initials", "UserName", "MonthlyStatement"]
         selectQ = """SELECT entity.Pk_EntityID, entity.Name, entity.Surname, entity.Initials, entity.UserName, entity.MonthlyStatement
                                   FROM entity"""
-        headers = ["Pk_EntityID", "Name", "Surname", "Initials", "UserName", "MonthlyStatement"]
-        self.__model = utilityClasses.TestTransactionSqlQueryModel.TransactionSqlQueryModel_NewRecord(selectQ, headers, self._db)
+
+        '''
+        #QueryBindListExample (Transaction Support [commit & rollback]):
+        Ex1: ["query1 :bindX query2 :bindX query3 :bindX", ":q1BoundItem1", ":q1BoundItem2", ":q2BoundItem1", ":q2BoundItem2", ":q3BoundItem1", ":q3BoundItem2"]
+        Ex2: ["query1 :bindX", ":q1BoundItem1", ":q1BoundItem2"]
+        '''
+        appQueryNBindLst = ["""INSERT INTO entity(Name, Surname, Initials, UserName, MonthlyStatement) 
+                               VALUES(:Name, :Surname, :Initials, :UserName, :MonthlyStatement);""",
+                               "Name", "Surname", "Initials", "UserName", "MonthlyStatement"]
+        updQueryNBindList = ["""UPDATE entity
+                                SET Name = :Name, Surname = :Surname, Initials = :Initials, UserName = :UserName, MonthlyStatement = :MonthlyStatement
+                                WHERE Pk_EntityID = :Pk_EntityID;""",
+                                "Name", "Surname", "Initials", "UserName", "MonthlyStatement", "Pk_EntityID"]
+
+        self.__model = utilityClasses.TestTransactionSqlQueryModel.TransactionSqlQueryModel_NewRecord(headers, selectQ, appQueryNBindLst,
+                                                                                                      updQueryNBindList, self._db)
 
     def getModel(self):
         try:
-            '''
-            #QueryBindListExample (Transaction Support [commit & rollback]):
-            Ex1: ["query1 :bindX query2 :bindX query3 :bindX", ":q1BoundItem1", ":q1BoundItem2", ":q2BoundItem1", ":q2BoundItem2", ":q3BoundItem1", ":q3BoundItem2"]
-            Ex2: ["query1 :bindX", ":q1BoundItem1", ":q1BoundItem2"]
-            '''
-            #updateQueryAndBindingLst = [["""UPDATE entity
-            #                                SET Name = :Name, Surname = :Surname, Initials = :Initials, UserName = :UserName, MonthlyStatement = :MonthlyStatement
-            #                                WHERE Pk_EntityID = :Pk_EntityID;""",
-            #                                 ":Name", ":Surname", ":Initials", ":UserName", ":MonthlyStatement", ":Pk_EntityID"]]
-            #self.__model.setUpdateQuery(updateQueryAndBindingLst)
-
             #deleteQueryAndBindingLst = [["""DELETE FROM entity WHERE entity.Pk_EntityID = :Pk_EntityID;""",
             #                                 ":Pk_EntityID"]]
             #self.__model.setDeleteQuery(deleteQueryAndBindingLst)
@@ -32,10 +36,6 @@ class ModelEntityInterface(models._databaseConnection.DBConnection):
         except Exception as e:
             raise Exception("ModelEntity - getModel: " + self.__model.lastError().text())
 
-    def insertRow(self):
-        appQueryDefaultRecord = """INSERT INTO entity(Name, Surname, Initials, UserName, MonthlyStatement) 
-                                                 VALUES("New", "New", "New", "New", 1);"""
-        self.__model.insertRow(appQueryDefaultRecord)
 
     def search(self, searchVal):
         self.__model.searchSQL("""SELECT entity.Pk_EntityID, entity.Name, entity.Surname, entity.Initials, entity.UserName, entity.MonthlyStatement
