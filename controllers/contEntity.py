@@ -119,13 +119,14 @@ class ContEntity(QtWidgets.QMainWindow):
 
     def closeEvent(self, event):
         print("closing")
+        self.actionPrev()
+        self.actionNext()
         self.__model.save(self.__tableViewSelectionModel.currentIndex().row())
         #event.iqnore()
 
 
 def except_hook(cls, exception, traceback):
     sys.__excepthook__(cls, exception, traceback)
-
 if __name__ == "__main__":
     import sys
     sys.excepthook = except_hook

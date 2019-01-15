@@ -368,17 +368,37 @@ class TransactionSqlQueryModel_NewRecord(QtSql.QSqlQueryModel):
         #print("Save action recevied")
         if self.__dirty == True:
             if previousRow + 1 >= self.rowCountActual() + 1:
-                print("Appending")
+                #print("Appending")
                 if self.insertRow() == True:
                     self.__dirty = False
             else:
-                print("rowEditing yet to be implemented")
-                #if self.editRow() == True:
-                #    self.__dirty = False
-                self.__dirty = False
+                #print("Editing")
+                if self.editRow() == True:
+                    self.__dirty = False
             self.__dirtyRecord = self.record()
         else:
             print("row not dirty no need to save")
+
+    def editRow(self):
+        try:
+            self.__db.transaction()
+            q = utilityClasses.dataStructures.QSqlQueryExt(self.__db)
+            q.prepareNBindLst(self.__updQueryNBindList, self.__dirtyRecord)
+            q.exec()
+            self.__db.commit()
+            self.requery()
+            return True
+
+            if query.lastError().number() > 0:
+                print("SQL Append Error")
+                print(query.executedQuery())
+                print(query.lastError().text())
+                raise Exception
+                return False
+        except Exception as e:
+            self.__db.rollback()
+            print(str(e))
+            return False
 
     def insertRow(self, parent = QtCore.QModelIndex()):
         rows = 1

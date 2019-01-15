@@ -2,11 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3e10d509-3b15-4826-bdbb-1dac880f3e4f" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/controllers/contEntity.py" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/contEntity.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/modelTestTable.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/modelTestTable.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/utilityClasses/TestTransactionSqlQueryModel.py" beforeDir="false" afterPath="$PROJECT_DIR$/utilityClasses/TestTransactionSqlQueryModel.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utilityClasses/dataStructures.py" beforeDir="false" afterPath="$PROJECT_DIR$/utilityClasses/dataStructures.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -19,8 +16,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/controllers/contEntity.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="115">
-              <caret line="106" column="19" selection-start-line="106" selection-start-column="19" selection-end-line="106" selection-end-column="19" />
+            <state relative-caret-position="-1445">
+              <caret line="11" column="8" lean-forward="true" selection-start-line="11" selection-start-column="8" selection-end-line="11" selection-end-column="8" />
               <folding>
                 <element signature="e#0#35#0" expanded="true" />
               </folding>
@@ -31,8 +28,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/models/modelTestTable.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="340">
-              <caret line="26" column="141" selection-start-line="26" selection-start-column="141" selection-end-line="26" selection-end-column="141" />
+            <state relative-caret-position="306">
+              <caret line="24" column="54" selection-start-line="24" selection-start-column="54" selection-end-line="24" selection-end-column="54" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -43,8 +40,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/utilityClasses/TestTransactionSqlQueryModel.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="142">
-              <caret line="413" column="35" lean-forward="true" selection-start-line="413" selection-start-column="35" selection-end-line="413" selection-end-column="35" />
+            <state relative-caret-position="132">
+              <caret line="372" column="17" selection-start-line="372" selection-start-column="17" selection-end-line="372" selection-end-column="17" />
               <folding>
                 <element signature="e#0#49#0" expanded="true" />
                 <element signature="e#15021#15813#1" />
@@ -77,7 +74,6 @@
       <find>insertrows</find>
       <find>rowChanged</find>
       <find>rowchanged</find>
-      <find>save</find>
       <find>updatedirty</find>
       <find>insert</find>
       <find>blank</find>
@@ -94,6 +90,7 @@
       <find>super</find>
       <find>print</find>
       <find>removerows</find>
+      <find>save</find>
     </findStrings>
     <replaceStrings>
       <replace>__runTransactionQueries</replace>
@@ -129,10 +126,10 @@
         <option value="$PROJECT_DIR$/controllers/contTestTable.py" />
         <option value="$PROJECT_DIR$/controllers/conInsertRecord.py" />
         <option value="$PROJECT_DIR$/utilityClasses/delegates.py" />
-        <option value="$PROJECT_DIR$/models/modelTestTable.py" />
-        <option value="$PROJECT_DIR$/controllers/contEntity.py" />
         <option value="$PROJECT_DIR$/utilityClasses/dataStructures.py" />
+        <option value="$PROJECT_DIR$/models/modelTestTable.py" />
         <option value="$PROJECT_DIR$/utilityClasses/TestTransactionSqlQueryModel.py" />
+        <option value="$PROJECT_DIR$/controllers/contEntity.py" />
       </list>
     </option>
   </component>
@@ -474,7 +471,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/utilityClasses/TestTransactionSqlQueryModel.py</url>
-          <line>380</line>
+          <line>379</line>
           <option name="timeStamp" value="63" />
         </line-breakpoint>
       </breakpoints>
@@ -742,8 +739,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/models/modelTestTable.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="26" column="141" selection-start-line="26" selection-start-column="141" selection-end-line="26" selection-end-column="141" />
+        <state relative-caret-position="306">
+          <caret line="24" column="54" selection-start-line="24" selection-start-column="54" selection-end-line="24" selection-end-column="54" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>
@@ -752,8 +749,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/utilityClasses/TestTransactionSqlQueryModel.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="142">
-          <caret line="413" column="35" lean-forward="true" selection-start-line="413" selection-start-column="35" selection-end-line="413" selection-end-column="35" />
+        <state relative-caret-position="132">
+          <caret line="372" column="17" selection-start-line="372" selection-start-column="17" selection-end-line="372" selection-end-column="17" />
           <folding>
             <element signature="e#0#49#0" expanded="true" />
             <element signature="e#15021#15813#1" />
@@ -763,8 +760,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/controllers/contEntity.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="115">
-          <caret line="106" column="19" selection-start-line="106" selection-start-column="19" selection-end-line="106" selection-end-column="19" />
+        <state relative-caret-position="-1445">
+          <caret line="11" column="8" lean-forward="true" selection-start-line="11" selection-start-column="8" selection-end-line="11" selection-end-column="8" />
           <folding>
             <element signature="e#0#35#0" expanded="true" />
           </folding>
