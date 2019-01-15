@@ -93,7 +93,6 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionSave"/>
   </widget>
   <action name="actionNewRecord">
    <property name="icon">
@@ -104,7 +103,7 @@
     <string>Insert New Record</string>
    </property>
    <property name="toolTip">
-    <string>Add a New Record</string>
+    <string>Insert a New Record</string>
    </property>
   </action>
   <action name="actionFirst">

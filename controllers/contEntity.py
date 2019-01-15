@@ -3,7 +3,6 @@ import views.viewEntitySearch
 import views.viewEntity
 import controllers.conInsertRecord
 import models.modelEntity
-import models.modelTestTable
 import utilityClasses.delegates
 
 class ContEntity(QtWidgets.QMainWindow):
@@ -14,14 +13,15 @@ class ContEntity(QtWidgets.QMainWindow):
         self.__dirtyRow = -1
 
         #app.aboutToQuit.connect(self.closeEvent)
-        self.__modelInterface = models.modelTestTable.ModelEntityInterface()
+        self.__modelInterface = models.modelEntity.ModelEntityInterface()
         self.__model = self.__modelInterface.getModel()
         self.__ui.toolbCrud.addWidget(self.__ui.txtSearch)
         self.__ui.toolbCrud.addAction(self.__ui.actionFind)
         self.__ui.toolbCrud.addAction(self.__ui.actionDelete)
-        #self.__ui.tableView.horizontalHeader().sortIndicatorChanged.connect(self.__model.orderBy)
+        self.__ui.tableView.horizontalHeader().sortIndicatorChanged.connect(self.__model.orderBy)
 
         self.__ui.txtSearch.returnPressed.connect(lambda: self.__modelInterface.search(self.__ui.txtSearch.text()))
+        #self.__ui.txtSearch. .connect(lambda: print("aaaa"))
         self.__ui.actionFind.triggered.connect(lambda: self.__modelInterface.search(self.__ui.txtSearch.text()))
 
         #setup tableView & hide pk
@@ -97,6 +97,12 @@ class ContEntity(QtWidgets.QMainWindow):
                 delRowsCount = len(selectedRowsList)
                 self.__model.removeRows(delRowStartPos, delRowsCount)
 
+            #select a row to refresh view
+            if delRowStartPos - 1 >= 0:
+                self.__ui.tableView.selectRow(delRowStartPos - 1)
+            else:
+                self.__ui.tableView.selectRow(delRowStartPos + 1)
+
         else:
             #no selection
             msgbox = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Warning, "No Selection",
@@ -118,7 +124,7 @@ class ContEntity(QtWidgets.QMainWindow):
         self.__ui.tableView.selectRow(self.__model.rowCountActual() - 1)
 
     def closeEvent(self, event):
-        print("closing")
+        #print("closing")
         self.actionPrev()
         self.actionNext()
         self.__model.save(self.__tableViewSelectionModel.currentIndex().row())

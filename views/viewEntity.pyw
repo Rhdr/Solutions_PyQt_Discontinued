@@ -98,7 +98,6 @@ class Ui_MainWindow(object):
         self.toolbNav.addAction(self.actionNext)
         self.toolbNav.addAction(self.actionLast)
         self.toolbNav.addAction(self.actionNewRecord)
-        self.toolbCrud.addAction(self.actionSave)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -110,7 +109,7 @@ class Ui_MainWindow(object):
         self.toolbNav.setWindowTitle(_translate("MainWindow", "toolBar_2"))
         self.toolbCrud.setWindowTitle(_translate("MainWindow", "toolBar"))
         self.actionNewRecord.setText(_translate("MainWindow", "Insert New Record"))
-        self.actionNewRecord.setToolTip(_translate("MainWindow", "Add a New Record"))
+        self.actionNewRecord.setToolTip(_translate("MainWindow", "Insert a New Record"))
         self.actionFirst.setToolTip(_translate("MainWindow", "Go to First Record"))
         self.actionPrev.setToolTip(_translate("MainWindow", "Go to Previous Record"))
         self.actionNext.setToolTip(_translate("MainWindow", "Go to Next Record"))

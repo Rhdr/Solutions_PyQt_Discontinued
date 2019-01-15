@@ -22,7 +22,7 @@ class ModelEntityInterface(models._databaseConnection.DBConnection):
                                 WHERE Pk_EntityID = :Pk_EntityID;""",
                                 "Name", "Surname", "Initials", "UserName", "MonthlyStatement", "Pk_EntityID"]
         deleteQueryNBindLst = ["""DELETE FROM entity WHERE entity.Pk_EntityID = :Pk_EntityID;""",
-                                         "Pk_EntityID"]
+                                  "Pk_EntityID"]
         self.__model = utilityClasses.TestTransactionSqlQueryModel.TransactionSqlQueryModel_NewRecord(headers, selectQ, appQueryNBindLst,
                                                                                                       updQueryNBindList, deleteQueryNBindLst, self._db)
 
