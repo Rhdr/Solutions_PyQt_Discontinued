@@ -342,11 +342,11 @@ class TransactionSqlQueryModel_NewRecord(QtSql.QSqlQueryModel):
                 else:
                     return "*"
 
-    def rowChanged(self, newRowNr):
+    def rowChanged(self, currentRow, previousRow):
         #save record & record nr/index on rowchange, controllers need to connect their views to the rowChanged method
-        self.__dirtyRecord = self.record(newRowNr)
-        self.__currentRowIndex = newRowNr
-        self.save(newRowNr)
+        self.__dirtyRecord = self.record(currentRow)
+        self.__currentRowIndex = currentRow
+        self.save(previousRow)
 
     def requery(self):
         super(TransactionSqlQueryModel_NewRecord, self).setQuery(self.query().lastQuery())
@@ -363,10 +363,10 @@ class TransactionSqlQueryModel_NewRecord(QtSql.QSqlQueryModel):
         self.__newRowCount = 1
         self.layoutChanged.emit()
 
-    def save(self, currentRow):
-        print("Save action recevied")
+    def save(self, previousRow = True):
+        #print("Save action recevied")
         if self.__dirty == True:
-            if currentRow >= self.rowCountActual() + 1:
+            if previousRow + 1 >= self.rowCountActual() + 1:
                 print("Appending")
                 if self.insertRow() == True:
                     self.__dirty = False

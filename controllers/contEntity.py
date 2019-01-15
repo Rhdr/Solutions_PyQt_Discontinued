@@ -54,40 +54,27 @@ class ContEntity(QtWidgets.QMainWindow):
         self.__ui.actionNext.triggered.connect(self.actionNext)
         self.__ui.actionLast.triggered.connect(self.actionLast)
 
-        #self.__addedBlankRow = False
-
     def delegateCommitData(self):
-        print("delegateCommitData")
+        #add a new blank row when the last one is used
         if self.__tableViewSelectionModel.currentIndex().row() == self.__model.rowCountActual(): # and self.__addedBlankRow == False:
             self.__model.insertNewBlankRows()
-            self.__addedBlankRow = True
 
     def rowChanged(self, current = None, previous = None):
-        #signal model on rowchange to initiate a save
-        #update view recordNr lable
-        #on last row add new blank row
-        print("RowChanged")
-        #signal model that the row changed
-        r = self.__tableViewSelectionModel.currentIndex().row()
-        self.__model.rowChanged(r)
-        self.__ui.tableView.selectRow(r)
+        #signal model that the row changed to iniate save
+        self.__model.rowChanged(current.row(), previous.row())
+        self.__ui.tableView.selectRow(current.row())
 
-        #update recordNr
-        currentRow = str(self.__tableViewSelectionModel.currentIndex().row() + 1)
-        rowCount = str(self.__model.rowCount())
+        #update view recordNr lable
+        currentRow = str(current.row() + 1)
+        rowCount = str(self.__model.rowCountActual())
         self.__ui.actionRecordNr.setText("Record " + currentRow + " of " + rowCount)
 
-        #add new blank row
-        #if r == self.__model.rowCount() - 1:
-        #if r < self.__model.rowCountActual():
+        #remove any exccess blank rows
         self.__model.resetNewBlankRows()
-        #self.__addedBlankRow = False
 
     def actionAdd(self):
         #add new row to bottom of table
-        self.__model.insertNewBlankRows()
-        self.actionLast()
-        self.__ui.tableView.scrollToBottom()
+        self.__ui.tableView.selectRow(self.__model.rowCount() - 1)
 
     def actionDelete(self):
         #check if there is a selection, get user confirmation & delete
@@ -125,7 +112,7 @@ class ContEntity(QtWidgets.QMainWindow):
 
     def actionLast(self):
         #last record may be blank used to add more records
-        self.__ui.tableView.selectRow(self.__model.rowCount() - 1)
+        self.__ui.tableView.selectRow(self.__model.rowCountActual() - 1)
 
     def closeEvent(self, event):
         print("closing")
