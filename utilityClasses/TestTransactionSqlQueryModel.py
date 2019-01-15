@@ -280,7 +280,7 @@ class TransactionSqlQueryModel(QtSql.QSqlQueryModel):
 """
 
 class TransactionSqlQueryModel_NewRecord(QtSql.QSqlQueryModel):
-    def __init__(self, headersLst, selectQ, appQueryNBindList, updQueryNBindList, db, parent = None):
+    def __init__(self, headersLst, selectQ, appQueryNBindList, updQueryNBindList, deleteQueryNBindLst, db, parent = None):
         QtSql.QSqlQueryModel.__init__(self, parent)
         self.__headers = headersLst
         self.__db = db
@@ -289,6 +289,7 @@ class TransactionSqlQueryModel_NewRecord(QtSql.QSqlQueryModel):
         self.__dirtyRecord = QtSql.QSqlRecord()
         self.__appQueryNBindList = appQueryNBindList
         self.__updQueryNBindList = updQueryNBindList
+        self.__deleteQueryNBindLst = deleteQueryNBindLst
         self.__currentRowIndex = 0
 
         self.setQuery(selectQ)
@@ -382,43 +383,54 @@ class TransactionSqlQueryModel_NewRecord(QtSql.QSqlQueryModel):
     def insertRow(self, parent = QtCore.QModelIndex()):
         rows = 1
         pos = self.rowCount()
+        try:
+            self.beginInsertRows(parent, pos, pos + rows - 1)
+            self.__db.transaction()
+            q = utilityClasses.dataStructures.QSqlQueryExt(self.__db)
+            q.prepareNBindLst(self.__appQueryNBindList, self.__dirtyRecord)
+            q.exec()
+            self.__db.commit()
+            self.endInsertRows()
+            self.requery()
+            return True
 
-        #self.beginInsertRows(parent, pos, pos + rows - 1)
-        #try:
-        self.__db.transaction()
-        q = QtSql.QSqlQuery(self.__db)
-        q.prepare(self.__appQueryNBindList[0])
-        for i in range(len(self.__appQueryNBindList)):
-            if i > 0:  #because first value is the query
-                f = self.__dirtyRecord.field(self.__dirtyRecord.indexOf(self.__appQueryNBindList[i]))
-                bind = ":" + self.__appQueryNBindList[i]
-                bindValue = f.value()
-                q.bindValue(bind, bindValue)
-            else:
-                pass
-        q.exec()
-        self.__db.commit()
-        #self.endInsertRows()
-        self.requery()
-        return True
-
-        if query.lastError().number() > 0:
-            print("SQL Append Error")
-            print(query.executedQuery())
-            print(query.lastError().text())
-            raise Exception
+            if query.lastError().number() > 0:
+                print("SQL Append Error")
+                print(query.executedQuery())
+                print(query.lastError().text())
+                raise Exception
+                return False
+        except Exception as e:
+            self.__db.rollback()
+            print(str(e))
             return False
-        #except Exception as e:
-        #    self.__db.rollback()
-        #    print(str(e))
-        #    return False
 
-    def removeRows(self, pos, rows, deleteSQL, parent = QtCore.QModelIndex()):
-        self.beginRemoveRows(parent, pos, pos + rows - 1)
-        for i in range(rows):
-            self.__colors.pop(pos)
-        self.endRemoveRows()
-        return True
+    def removeRows(self, pos, rows, parent = QtCore.QModelIndex()):
+        try:
+            self.beginRemoveRows(parent, pos, pos + rows - 1)
+            for i in range(rows):
+                self.__dirtyRecord = self.record(pos + i)
+                self.__db.transaction()
+                q = utilityClasses.dataStructures.QSqlQueryExt(self.__db)
+                q.prepareNBindLst(self.__deleteQueryNBindLst, self.__dirtyRecord)
+                q.exec()
+                self.__db.commit()
+            self.endRemoveRows()
+            self.__dirtyRecord = self.record()
+            self.requery()
+            return True
+
+            if query.lastError().number() > 0:
+                print("SQL Append Error")
+                print(query.executedQuery())
+                print(query.lastError().text())
+                raise Exception
+                return False
+
+        except Exception as e:
+            self.__db.rollback()
+            print(str(e))
+            return False
 
     def rowCount(self, parent = None):
         #return extra row count + 1 if inserting a row

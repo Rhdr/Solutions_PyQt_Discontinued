@@ -21,20 +21,13 @@ class ModelEntityInterface(models._databaseConnection.DBConnection):
                                 SET Name = :Name, Surname = :Surname, Initials = :Initials, UserName = :UserName, MonthlyStatement = :MonthlyStatement
                                 WHERE Pk_EntityID = :Pk_EntityID;""",
                                 "Name", "Surname", "Initials", "UserName", "MonthlyStatement", "Pk_EntityID"]
-
+        deleteQueryNBindLst = ["""DELETE FROM entity WHERE entity.Pk_EntityID = :Pk_EntityID;""",
+                                         "Pk_EntityID"]
         self.__model = utilityClasses.TestTransactionSqlQueryModel.TransactionSqlQueryModel_NewRecord(headers, selectQ, appQueryNBindLst,
-                                                                                                      updQueryNBindList, self._db)
+                                                                                                      updQueryNBindList, deleteQueryNBindLst, self._db)
 
     def getModel(self):
-        try:
-            #deleteQueryAndBindingLst = [["""DELETE FROM entity WHERE entity.Pk_EntityID = :Pk_EntityID;""",
-            #                                 ":Pk_EntityID"]]
-            #self.__model.setDeleteQuery(deleteQueryAndBindingLst)
-
-            return self.__model
-
-        except Exception as e:
-            raise Exception("ModelEntity - getModel: " + self.__model.lastError().text())
+        return self.__model
 
 
     def search(self, searchVal):

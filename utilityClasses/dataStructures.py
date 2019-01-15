@@ -1,3 +1,4 @@
+from PyQt5 import QtSql
 
 class Node:
     def __init__(self, data = None, next = None):
@@ -145,9 +146,22 @@ class LinkedListOfListsNoDuplicates(LinkedListOfLists):
             self.removeNode(data[dupplicateColCheck], dupplicateColCheck)
         super(LinkedListOfListsNoDuplicates, self).addFront(data)
 
+class QSqlQueryExt(QtSql.QSqlQuery):
+    def __init__(self, db):
+        super(QSqlQueryExt, self).__init__(db)
+
+    def prepareNBindLst(self, p_lst, bindRecord):
+        #prepare a query list where 1st value == query, next+ == bindings
+        self.prepare(p_lst[0])
+        for i in range(len(p_lst)):
+            if i > 0:  #because first value is the query
+                f = bindRecord.field(bindRecord.indexOf(p_lst[i]))
+                bindValue = f.value()
+                bind = ":" + p_lst[i]
+                self.bindValue(bind, bindValue)
+
 def except_hook(cls, exception, traceback):
     sys.__excepthook__(cls, exception, traceback)
-
 if __name__ == "__main__":
     import sys
     sys.excepthook = except_hook

@@ -62,15 +62,18 @@ class ContEntity(QtWidgets.QMainWindow):
     def rowChanged(self, current = None, previous = None):
         #signal model that the row changed to iniate save
         self.__model.rowChanged(current.row(), previous.row())
-        self.__ui.tableView.selectRow(current.row())
-
-        #update view recordNr lable
-        currentRow = str(current.row() + 1)
-        rowCount = str(self.__model.rowCountActual())
-        self.__ui.actionRecordNr.setText("Record " + currentRow + " of " + rowCount)
+        if current.row() == self.__model.rowCountActual():
+            self.__ui.tableView.selectRow(current.row())
+        self.updateRowCountLbl()
 
         #remove any exccess blank rows
         self.__model.resetNewBlankRows()
+
+    def updateRowCountLbl(self):
+        #update view recordNr lable
+        currentRow = str(self.__tableViewSelectionModel.currentIndex().row() + 1)
+        rowCount = str(self.__model.rowCountActual())
+        self.__ui.actionRecordNr.setText("Record " + currentRow + " of " + rowCount)
 
     def actionAdd(self):
         #add new row to bottom of table
