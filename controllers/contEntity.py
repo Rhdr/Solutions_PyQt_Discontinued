@@ -28,11 +28,9 @@ class ContEntity(QtWidgets.QMainWindow):
         self.__ui.tableView.setModel(self.__model)
 
         self.__tableViewSelectionModel = self.__ui.tableView.selectionModel()
-        #self.__tableViewSelectionModel.currentRowChanged.connect(lambda: self.__model.rowChanged(self.__tableViewSelectionModel.currentIndex().row()))
         self.__tableViewSelectionModel.currentRowChanged.connect(self.rowChanged)
         self.__ui.tableView.installEventFilter(self)
         self.__ui.tableView.hideColumn(0)
-        self.__ui.tableView.rowsInserted.connect(self.actionLast)
 
         #setup & link delegates
         lineEditDelegate = utilityClasses.delegates.LineEditDelegate(self.__ui.tableView)
@@ -43,8 +41,8 @@ class ContEntity(QtWidgets.QMainWindow):
         self.__ui.tableView.setItemDelegateForColumn(4, lineEditDelegate)
         self.__ui.tableView.setItemDelegateForColumn(5, spinBoxDelegate)
 
-        #spinBoxDelegate.commitData.connect(self.delegateCommitData)
-        #lineEditDelegate.commitData.connect(self.delegateCommitData)
+        spinBoxDelegate.commitData.connect(self.delegateCommitData)
+        lineEditDelegate.commitData.connect(self.delegateCommitData)
 
         #connect crud
         self.__ui.actionNewRecord.triggered.connect(self.actionAdd)
@@ -56,68 +54,23 @@ class ContEntity(QtWidgets.QMainWindow):
         self.__ui.actionNext.triggered.connect(self.actionNext)
         self.__ui.actionLast.triggered.connect(self.actionLast)
 
-    '''
+        #self.__addedBlankRow = False
+
     def delegateCommitData(self):
         print("delegateCommitData")
-        i = self.__tableViewSelectionModel.currentIndex()
-        print(i.column(), self.__model.columnCount()-1)
-        if i.row() == self.__model.rowCount() - 1:
-                print(self.__dirtyRow, i.row())
-                if self.__dirtyRow != -1 and self.__dirtyRow != i.row():
-                    #append
-                    print("append")
-                    #pass
-                self.__dirtyRow = i.row()
-                self.__model.insertNewBlankRows(1)
-    '''
-    def eventFilter(self, object, event):
-        pass
-        '''
-        #print(object, event)
-        if event.type() == QtCore.QEvent.InputMethodQuery:
-            #catch the on focus event
-            i = self.__tableViewSelectionModel.currentIndex()
-            if i.row() == self.__model.rowCount() - 1:
-                self.__model.insertNewBlankRows(1)
-                print("inserted blank")
-            print("")
-        return True
-        '''
-        '''
-        if event.type() == QtCore.QEvent.KeyPress and event.key() == QtCore.Qt.Key_Escape:
-            #print("Escape Pressed")
-            self.__model.escapePressed(self.__ui.tableView.currentIndex().row())
-            return True
-        
-        if event.type() == QtCore.QEvent.KeyPress and event.key() == QtCore.Qt.Key_Tab:
-            #attempt to catch & handle the tab key (prevent tab from jumping to first record when adding new rows)
-            currentRow = self.__ui.tableView.currentIndex().row()
-            currentCol = self.__ui.tableView.currentIndex().column()
-
-            modelRow = self.__model.rowCountActual()
-            modelCol = self.__model.columnCount() - 1
-            #print("currentRow:", currentRow, "currentCol:", currentCol)
-            #print("modelRow:", modelRow, "modelCol:", modelCol)
-            if currentRow == -1 or currentCol == -1:
-                return True     #stop
-            elif currentRow >= modelRow and currentCol >= modelCol:
-                return True     #stop
-            else:
-                return False    #go ahead
-        '''
-        return False
-
+        if self.__tableViewSelectionModel.currentIndex().row() == self.__model.rowCountActual(): # and self.__addedBlankRow == False:
+            self.__model.insertNewBlankRows()
+            self.__addedBlankRow = True
 
     def rowChanged(self, current = None, previous = None):
         #signal model on rowchange to initiate a save
         #update view recordNr lable
         #on last row add new blank row
-
-        #print("rowchanged")
-
+        print("RowChanged")
         #signal model that the row changed
         r = self.__tableViewSelectionModel.currentIndex().row()
         self.__model.rowChanged(r)
+        self.__ui.tableView.selectRow(r)
 
         #update recordNr
         currentRow = str(self.__tableViewSelectionModel.currentIndex().row() + 1)
@@ -126,8 +79,9 @@ class ContEntity(QtWidgets.QMainWindow):
 
         #add new blank row
         #if r == self.__model.rowCount() - 1:
-        if r == self.__model.rowCountActual():
-            self.__model.insertNewBlankRows()
+        #if r < self.__model.rowCountActual():
+        self.__model.resetNewBlankRows()
+        #self.__addedBlankRow = False
 
     def actionAdd(self):
         #add new row to bottom of table
