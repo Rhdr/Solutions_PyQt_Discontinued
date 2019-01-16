@@ -61,11 +61,10 @@ class ContMainMenu(QtWidgets.QMainWindow):
                 #My Entity
                 print("My Entity Clicked")
                 import controllers.contEntity
-                self.__clsModelEntity = models.modelEntity.ModelEntity()
                 self.__subWindow = controllers.contEntity.ContEntity(self)
+                self.__subWindow.setTitle("My Entity")
                 self.__ui.mdiArea.addSubWindow(self.__subWindow)
                 self.__subWindow.showNormal()
-                #self.refreshMDIView()
 
             elif item.text(column) == "Property":
                 print("Property clicked")

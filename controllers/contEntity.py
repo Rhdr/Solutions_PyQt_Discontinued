@@ -1,5 +1,4 @@
 from PyQt5 import QtWidgets, QtCore
-import views.viewEntitySearch
 import views.viewEntity
 import controllers.conInsertRecord
 import models.modelEntity
@@ -8,29 +7,25 @@ import utilityClasses.delegates
 class ContEntity(QtWidgets.QMainWindow):
     def __init__(self, parent):
         QtWidgets.QMainWindow.__init__(self, parent)
+        #setup ui & models & searching
         self.__ui = views.viewEntity.Ui_MainWindow()
         self.__ui.setupUi(self)
-        self.__dirtyRow = -1
-
-        #app.aboutToQuit.connect(self.closeEvent)
         self.__modelInterface = models.modelEntity.ModelEntityInterface()
         self.__model = self.__modelInterface.getModel()
         self.__ui.toolbCrud.addWidget(self.__ui.txtSearch)
         self.__ui.toolbCrud.addAction(self.__ui.actionFind)
         self.__ui.toolbCrud.addAction(self.__ui.actionDelete)
-        self.__ui.tableView.horizontalHeader().sortIndicatorChanged.connect(self.__model.orderBy)
+        self.__ui.txtSearch.returnPressed.connect(self.find)
+        self.__ui.actionFind.triggered.connect(self.find)
+        self.__ui.txtSearch.textChanged.connect(lambda: self.find(True))
 
-        self.__ui.txtSearch.returnPressed.connect(lambda: self.__modelInterface.search(self.__ui.txtSearch.text()))
-        #self.__ui.txtSearch. .connect(lambda: print("aaaa"))
-        self.__ui.actionFind.triggered.connect(lambda: self.__modelInterface.search(self.__ui.txtSearch.text()))
-
-        #setup tableView & hide pk
+        #setup tableView & hide pk & connect sorting
         self.__ui.tableView.setModel(self.__model)
-
         self.__tableViewSelectionModel = self.__ui.tableView.selectionModel()
         self.__tableViewSelectionModel.currentRowChanged.connect(self.rowChanged)
         self.__ui.tableView.installEventFilter(self)
         self.__ui.tableView.hideColumn(0)
+        self.__ui.tableView.horizontalHeader().sortIndicatorChanged.connect(self.__model.orderBy)
 
         #setup & link delegates
         lineEditDelegate = utilityClasses.delegates.LineEditDelegate(self.__ui.tableView)
@@ -40,19 +35,31 @@ class ContEntity(QtWidgets.QMainWindow):
         self.__ui.tableView.setItemDelegateForColumn(3, lineEditDelegate)
         self.__ui.tableView.setItemDelegateForColumn(4, lineEditDelegate)
         self.__ui.tableView.setItemDelegateForColumn(5, spinBoxDelegate)
-
         spinBoxDelegate.commitData.connect(self.delegateCommitData)
         lineEditDelegate.commitData.connect(self.delegateCommitData)
 
-        #connect crud
+        #connect crud & Nav
         self.__ui.actionNewRecord.triggered.connect(self.actionAdd)
         self.__ui.actionDelete.triggered.connect(self.actionDelete)
-
-        #connect nav
         self.__ui.actionFirst.triggered.connect(self.actionFirst)
         self.__ui.actionPrev.triggered.connect(self.actionPrev)
         self.__ui.actionNext.triggered.connect(self.actionNext)
         self.__ui.actionLast.triggered.connect(self.actionLast)
+
+    def setTitle(self, newTitleStr):
+        self.__ui.lblTitle.setText(newTitleStr)
+
+    def find(self, textChanged = False):
+        #find text & update the rowCount lbl
+        if textChanged == True and len(self.__ui.txtSearch.text()) == 0:
+            self.__modelInterface.search(self.__ui.txtSearch.text())
+            self.updateRowCountLbl()
+            self.actionNext()
+
+        if textChanged == False:
+            self.__modelInterface.search(self.__ui.txtSearch.text())
+            self.updateRowCountLbl()
+            self.actionNext()
 
     def delegateCommitData(self):
         #add a new blank row when the last one is used
