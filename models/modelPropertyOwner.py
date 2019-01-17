@@ -2,12 +2,12 @@ from PyQt5 import QtSql
 import models._databaseConnection
 import utilityClasses.TransactionSqlQueryModel
 
-class ModelEntityInterface(models._databaseConnection.DBConnection):
+class ModelPropertyOwnerInterface(models._databaseConnection.DBConnection):
     def __init__(self):
         self.connect()
         headers = ["Pk_EntityID", "Name", "Surname", "Initials", "UserName", "MonthlyStatement"]
         selectQ = """SELECT entity.Pk_EntityID, entity.Name, entity.Surname, entity.Initials, entity.UserName, entity.MonthlyStatement
-                                  FROM entity"""
+                     FROM propertyowner LEFT JOIN entity ON propertyowner.Pk_PropertOwnerID = entity.Pk_EntityID;"""
 
         '''
         #QueryBindListExample (Transaction Support [commit & rollback]):
@@ -36,25 +36,16 @@ class ModelEntityInterface(models._databaseConnection.DBConnection):
 
 def except_hook(cls, exception, traceback):
     sys.__excepthook__(cls, exception, traceback)
-
 if __name__ == "__main__":
     import sys
     sys.excepthook = except_hook
     from PyQt5 import QtWidgets
     app = QtWidgets.QApplication(sys.argv)
 
-    clsModel = ModelEntityInterface()
+    clsModel = ModelPropertyOwnerInterface()
     #try:
     clsModel.connect()
     model = clsModel.getModel()
     print(clsModel.connect())
     print(model.lastError().text())
-    '''
-    except:
-            print(__model.lastError().text())
-    finally:
-        clsModel.closeConnection()
-    '''
     sys.exit(app.exec_())
-
-    #testing version control

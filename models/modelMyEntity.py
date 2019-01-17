@@ -1,32 +1,57 @@
 from PyQt5 import QtSql
 import models._databaseConnection
+import utilityClasses.TransactionSqlQueryModel
 
-class ModelMyEntity(models._databaseConnection.DBConnection):
+class ModelMyEntityInterface(models._databaseConnection.DBConnection):
+    def __init__(self):
+        self.connect()
+        headers = ["Pk_EntityID", "Name", "Surname", "Initials", "UserName", "MonthlyStatement"]
+        selectQ = """SELECT entity.Pk_EntityID, entity.Name, entity.Surname, entity.Initials, entity.UserName, entity.MonthlyStatement
+                     FROM myentity LEFT JOIN entity ON myentity.Pk_MyEntityID = entity.Pk_EntityID;"""
+
+        '''
+        #QueryBindListExample (Transaction Support [commit & rollback]):
+        Ex1: ["query1 :bindX query2 :bindX query3 :bindX", ":q1BoundItem1", ":q1BoundItem2", ":q2BoundItem1", ":q2BoundItem2", ":q3BoundItem1", ":q3BoundItem2"]
+        Ex2: ["query1 :bindX", ":q1BoundItem1", ":q1BoundItem2"]
+        '''
+        appQueryNBindLst = ["""INSERT INTO entity(Name, Surname, Initials, UserName, MonthlyStatement) 
+                               VALUES(:Name, :Surname, :Initials, :UserName, :MonthlyStatement);
+                               INSERT INTO myentity(Pk_MyEntityID) 
+                               VALUES(LAST_INSERT_ID());""",
+                               "Name", "Surname", "Initials", "UserName", "MonthlyStatement"]
+        updQueryNBindList = ["""UPDATE entity
+                                SET Name = :Name, Surname = :Surname, Initials = :Initials, UserName = :UserName, MonthlyStatement = :MonthlyStatement
+                                WHERE Pk_EntityID = :Pk_EntityID;""",
+                                "Name", "Surname", "Initials", "UserName", "MonthlyStatement", "Pk_EntityID"]
+        deleteQueryNBindLst = ["""DELETE FROM myentity
+                                  WHERE myentity.Pk_MyEntityID = :Pk_EntityID;
+                                  DELETE FROM entity 
+                                  WHERE entity.Pk_EntityID = :Pk_EntityID;""",
+                                  "Pk_EntityID"]
+        self.__model = utilityClasses.TransactionSqlQueryModel.TransactionSqlQueryModel(headers, selectQ, appQueryNBindLst,
+                                                                                        updQueryNBindList, deleteQueryNBindLst, self._db)
+
     def getModel(self):
-        try:
-            self.__model = QtSql.QSqlQueryModel()
-            self.__model.setQuery("SELECT entity.Name \
-                                  FROM myentity LEFT JOIN entity \
-                                  ON myentity.Pk_MyEntityID = entity.Pk_EntityID")
-            return self.__model
+        return self.__model
 
-        except:
-            print(self.__db.lastError().text())
-            print(self.__query.lastError().text())
-            print(self.__model.lastError().text())
+    def search(self, searchVal):
+        self.__model.searchSQL("""SELECT entity.Pk_EntityID, entity.Name, entity.Surname, entity.Initials, entity.UserName, entity.MonthlyStatement
+                                  FROM myentity LEFT JOIN entity ON myentity.Pk_MyEntityID = entity.Pk_EntityID
+                                  WHERE entity.Name Like '%""" + searchVal + """%' OR entity.Surname Like '%""" + searchVal + """%' 
+                                  OR entity.Initials Like '%""" + searchVal + """%' OR entity.UserName Like '%""" + searchVal + """%';""")
 
+def except_hook(cls, exception, traceback):
+    sys.__excepthook__(cls, exception, traceback)
 if __name__ == "__main__":
-    from PyQt5 import QtWidgets
     import sys
+    sys.excepthook = except_hook
+    from PyQt5 import QtWidgets
     app = QtWidgets.QApplication(sys.argv)
 
-    p = QtWidgets.QWidget()
-    clsModel = ModelMyEntity(p)
-    try:
-        clsModel.connect()
-        model = clsModel.getModel()
-    finally:
-        clsModel.closeConnection()
-        print(model.lastError().text())
-
+    clsModel = ModelMyEntityInterface()
+    #try:
+    clsModel.connect()
+    model = clsModel.getModel()
+    print(clsModel.connect())
+    print(model.lastError().text())
     sys.exit(app.exec_())

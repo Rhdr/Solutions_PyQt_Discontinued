@@ -70,7 +70,7 @@ class TransactionSqlQueryModel(QtSql.QSqlQueryModel):
         #save record & record nr/index on rowchange, controllers need to connect their views to the rowChanged method
         self.__dirtyRecord = self.record(currentRow)
         self.__currentRowIndex = currentRow
-        self.save(previousRow)
+        return self.save(previousRow)
 
     def requery(self):
         super(TransactionSqlQueryModel, self).setQuery(self.query().lastQuery())
@@ -92,90 +92,81 @@ class TransactionSqlQueryModel(QtSql.QSqlQueryModel):
         if self.__dirty == True:
             if previousRow + 1 >= self.rowCountActual() + 1:
                 #print("Appending")
-                if self.insertRow() == True:
+                rowLst = self.insertRow()
+                if rowLst[0] == True:   #test for any errors
                     self.__dirty = False
             else:
                 #print("Editing")
-                if self.editRow() == True:
+                rowLst = self.editRow()
+                if rowLst[0] == True:  #test for any errors
                     self.__dirty = False
             self.__dirtyRecord = self.record()
 
-        #if still dirty notify user that the record could not be saved
-        if self.__dirty:
-            print("The record could not be saved")
+            return rowLst
+        else:
+            return [True]
+
 
     def editRow(self):
-        try:
-            self.__db.transaction()
-            q = utilityClasses.dataStructures.QSqlQueryExt(self.__db)
-            q.prepareNBindLst(self.__updQueryNBindList, self.__dirtyRecord)
-            q.exec()
-            self.__db.commit()
-            self.requery()
-            return True
+        self.__db.transaction()
+        q = utilityClasses.dataStructures.QSqlQueryExt(self.__db)
+        q.prepareNBindLst(self.__updQueryNBindList, self.__dirtyRecord)
+        q.exec()
+        self.__db.commit()
+        self.requery()
 
-            if query.lastError().number() > 0:
-                print("SQL Append Error")
-                print(query.executedQuery())
-                print(query.lastError().text())
-                raise Exception
-                return False
-        except Exception as e:
+        if q.lastError().number() > 0:
             self.__db.rollback()
-            print(str(e))
-            return False
+            print("SQL Model removeRows Error")
+            print(q.executedQuery())
+            err = q.lastError().text()
+            print(err)
+            return [False, err]
+        return [True]
 
     def insertRow(self, parent = QtCore.QModelIndex()):
         rows = 1
         pos = self.rowCount()
-        try:
-            self.beginInsertRows(parent, pos, pos + rows - 1)
-            self.__db.transaction()
-            q = utilityClasses.dataStructures.QSqlQueryExt(self.__db)
-            q.prepareNBindLst(self.__appQueryNBindList, self.__dirtyRecord)
-            q.exec()
-            self.__db.commit()
-            self.endInsertRows()
-            self.requery()
-            return True
 
-            if query.lastError().number() > 0:
-                print("SQL Append Error")
-                print(query.executedQuery())
-                print(query.lastError().text())
-                raise Exception
-                return False
-        except Exception as e:
+        self.beginInsertRows(parent, pos, pos + rows - 1)
+        self.__db.transaction()
+        q = utilityClasses.dataStructures.QSqlQueryExt(self.__db)
+        q.prepareNBindLst(self.__appQueryNBindList, self.__dirtyRecord)
+        q.exec()
+        self.__db.commit()
+        self.endInsertRows()
+        self.requery()
+
+        if q.lastError().number() > 0:
             self.__db.rollback()
-            print(str(e))
-            return False
+            print("SQL Model insertRow Error")
+            print(q.executedQuery())
+            err = q.lastError().text()
+            print(err)
+            return [False, err]
+        return [True]
 
     def removeRows(self, pos, rows, parent = QtCore.QModelIndex()):
-        try:
-            self.beginRemoveRows(parent, pos, pos + rows - 1)
-            for i in range(rows):
-                self.__dirtyRecord = self.record(pos + i)
-                self.__db.transaction()
-                q = utilityClasses.dataStructures.QSqlQueryExt(self.__db)
-                q.prepareNBindLst(self.__deleteQueryNBindLst, self.__dirtyRecord)
-                q.exec()
-                self.__db.commit()
-            self.__dirtyRecord = self.record()
-            self.requery()
-            self.endRemoveRows()
-            return True
+        self.beginRemoveRows(parent, pos, pos + rows - 1)
+        for i in range(rows):
+            self.__dirtyRecord = self.record(pos + i)
+            self.__db.transaction()
+            q = utilityClasses.dataStructures.QSqlQueryExt(self.__db)
+            q.prepareNBindLst(self.__deleteQueryNBindLst, self.__dirtyRecord)
+            q.exec()
+            self.__db.commit()
+        self.__dirtyRecord = self.record()
+        self.endRemoveRows()
+        self.requery()
 
-            if query.lastError().number() > 0:
-                print("SQL Append Error")
-                print(query.executedQuery())
-                print(query.lastError().text())
-                raise Exception
-                return False
-
-        except Exception as e:
+        if q.lastError().number() > 0:
             self.__db.rollback()
-            print("removeRows:", str(e))
-            return False
+            print("SQL Model removeRows Error")
+            print(q.executedQuery())
+            err = q.lastError().text()
+            print(err)
+            return [False, err]
+        return [True]
 
     def rowCount(self, parent = None):
         #return extra row count + 1 if inserting a row
@@ -247,34 +238,6 @@ class TransactionSqlQueryModel(QtSql.QSqlQueryModel):
         strQ = currentQueryNoOrder + orderBy + strOrder
         super(TransactionSqlQueryModel, self).setQuery(strQ)
         #print(strQ)
-
-
-"""
-Edit Row
-        rows = 1
-        pos = self.rowCount()
-        self.beginInsertRows(parent, pos, pos + rows - 1)
-        try:
-            self.__db.transaction()
-            q = QtSql.QSqlQuery()
-            q.prepare(appQueryAndBindingLst[0])
-            for i in range(len(appQueryAndBindingLst - 1))  #-1 because first value is the query
-                q.bindValue(appQueryAndBindingLst[i], ":")
-            q.exec()
-            self.endInsertRows()
-
-            self.__db.commit()
-            return True
-
-            if query.lastError().number() > 0:
-                print("SQL Error")
-                print(query.executedQuery())
-                print(query.lastError().text())
-                return False
-        except:
-            __db.rollback()
-            return False
-"""
 
 
 def except_hook(cls, exception, traceback):

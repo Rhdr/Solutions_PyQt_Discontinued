@@ -1,1 +1,0 @@
-pyuic5 -x viewInsertRecord.ui -o viewInsertRecord.pyw

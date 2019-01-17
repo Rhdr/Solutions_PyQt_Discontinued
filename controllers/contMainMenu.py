@@ -59,12 +59,21 @@ class ContMainMenu(QtWidgets.QMainWindow):
 
             elif item.text(column + 1) == "Entity_MyEntity":
                 #My Entity
-                print("My Entity Clicked")
-                import controllers.contEntity
-                self.__subWindow = controllers.contEntity.ContEntity(self)
-                self.__subWindow.setTitle("My Entity")
+                import controllers.contMyEntity
+                self.__subWindow = controllers.contMyEntity.ContMyEntity(self)
                 self.__ui.mdiArea.addSubWindow(self.__subWindow)
-                self.__subWindow.showNormal()
+                windowsLst = self.__ui.mdiArea.subWindowList()
+                windowsLst[len(windowsLst) - 1].resize(700, 400)
+                self.__subWindow.show()
+
+            elif item.text(column + 1) == "Entity_PropertyOwner":
+                #Property Owner
+                import controllers.contPropertyOwner
+                self.__subWindow = controllers.contPropertyOwner.ContPropertyOwner(self)
+                self.__ui.mdiArea.addSubWindow(self.__subWindow)
+                windowsLst = self.__ui.mdiArea.subWindowList()
+                windowsLst[len(windowsLst) - 1].resize(700,600)
+                self.__subWindow.show()
 
             elif item.text(column) == "Property":
                 print("Property clicked")
@@ -127,8 +136,11 @@ class ContMainMenu(QtWidgets.QMainWindow):
         finally:
             event.accept()
 
+def except_hook(cls, exception, traceback):
+    sys.__excepthook__(cls, exception, traceback)
 if __name__ == "__main__":
     import sys
+    sys.excepthook = except_hook
     app = QtWidgets.QApplication(sys.argv)
     contMain = ContMainMenu()
     contMain.showMaximized()
