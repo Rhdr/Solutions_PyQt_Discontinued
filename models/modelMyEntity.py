@@ -1,35 +1,42 @@
 from PyQt5 import QtSql
 import models._databaseConnection
 import utilityClasses.TransactionSqlQueryModel
+import utilityClasses.dataStructures
 
 class ModelMyEntityInterface(models._databaseConnection.DBConnection):
-    def __init__(self):
+    def __init__(self, parent):
+        super(ModelMyEntityInterface, self).__init__(parent)
         self.connect()
         headers = ["Pk_EntityID", "Name", "Surname", "Initials", "UserName", "MonthlyStatement"]
+        sqlQueryCRUDObject = utilityClasses.dataStructures.SQLQueryCRUDObject(headers, self._db, self)
+
         selectQ = """SELECT entity.Pk_EntityID, entity.Name, entity.Surname, entity.Initials, entity.UserName, entity.MonthlyStatement
                      FROM myentity LEFT JOIN entity ON myentity.Pk_MyEntityID = entity.Pk_EntityID;"""
+        sqlQueryCRUDObject.setSelectQ(selectQ)
 
-        '''
-        #QueryBindListExample (Transaction Support [commit & rollback]):
-        Ex1: ["query1 :bindX query2 :bindX query3 :bindX", ":q1BoundItem1", ":q1BoundItem2", ":q2BoundItem1", ":q2BoundItem2", ":q3BoundItem1", ":q3BoundItem2"]
-        Ex2: ["query1 :bindX", ":q1BoundItem1", ":q1BoundItem2"]
-        '''
-        appQueryNBindLst = ["""INSERT INTO entity(Name, Surname, Initials, UserName, MonthlyStatement) 
-                               VALUES(:Name, :Surname, :Initials, :UserName, :MonthlyStatement);
-                               INSERT INTO myentity(Pk_MyEntityID) 
-                               VALUES(LAST_INSERT_ID());""",
-                               "Name", "Surname", "Initials", "UserName", "MonthlyStatement"]
-        updQueryNBindList = ["""UPDATE entity
-                                SET Name = :Name, Surname = :Surname, Initials = :Initials, UserName = :UserName, MonthlyStatement = :MonthlyStatement
-                                WHERE Pk_EntityID = :Pk_EntityID;""",
-                                "Name", "Surname", "Initials", "UserName", "MonthlyStatement", "Pk_EntityID"]
-        deleteQueryNBindLst = ["""DELETE FROM myentity
-                                  WHERE myentity.Pk_MyEntityID = :Pk_EntityID;
-                                  DELETE FROM entity 
-                                  WHERE entity.Pk_EntityID = :Pk_EntityID;""",
-                                  "Pk_EntityID"]
-        self.__model = utilityClasses.TransactionSqlQueryModel.TransactionSqlQueryModel(headers, selectQ, appQueryNBindLst,
-                                                                                        updQueryNBindList, deleteQueryNBindLst, self._db)
+        appQ = """INSERT INTO entity(Import_OldPk, Import_OldType, Name, Surname, Initials, UserName, MonthlyStatement) 
+                    VALUES(0, 0, :Name, :Surname, :Initials, :UserName, :MonthlyStatement);
+                  INSERT INTO myentity(Pk_MyEntityID) 
+                    VALUES(LAST_INSERT_ID());"""
+        appBindLst = ["Name", "Surname", "Initials", "UserName", "MonthlyStatement"]
+        appDefaultValueLst = []
+        sqlQueryCRUDObject.setAppendQ(appQ, appBindLst, appDefaultValueLst)
+
+        updQ = """UPDATE entity
+                    SET Name = :Name, Surname = :Surname, Initials = :Initials, UserName = :UserName, MonthlyStatement = :MonthlyStatement
+                    WHERE Pk_EntityID = :Pk_EntityID;"""
+        updQBindLst = ["Name", "Surname", "Initials", "UserName", "MonthlyStatement", "Pk_EntityID"]
+        updDefaultValueLst = []
+        sqlQueryCRUDObject.setUpdateQ(updQ, updQBindLst, updDefaultValueLst)
+
+        delQ = """DELETE FROM myentity
+                    WHERE myentity.Pk_MyEntityID = :Pk_EntityID;
+                  DELETE FROM entity 
+                    WHERE entity.Pk_EntityID = :Pk_EntityID;"""
+        delQBindLst = ["Pk_EntityID"]
+        sqlQueryCRUDObject.setDeleteQ(delQ, delQBindLst)
+
+        self.__model = utilityClasses.TransactionSqlQueryModel.TransactionSqlQueryModel(sqlQueryCRUDObject, parent)
 
     def getModel(self):
         return self.__model
@@ -49,7 +56,6 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
 
     clsModel = ModelMyEntityInterface()
-    #try:
     clsModel.connect()
     model = clsModel.getModel()
     print(clsModel.connect())

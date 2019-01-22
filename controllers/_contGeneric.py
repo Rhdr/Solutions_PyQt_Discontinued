@@ -2,7 +2,8 @@ from PyQt5 import QtWidgets, QtCore
 
 class ContGeneric(QtCore.QObject):
     def __init__(self, ui, modelInterface, model, parent):
-        QtCore.QObject.__init__(self, parent)
+        #QtCore.QObject.__init__(self, parent)
+        super(ContGeneric, self).__init__(parent)
         self.__ui = ui
         self.__modelInterface = modelInterface
         self.__model = model
@@ -11,32 +12,43 @@ class ContGeneric(QtCore.QObject):
         self.__ui.tableView.horizontalHeader().sortIndicatorChanged.connect(self.__model.orderBy)
         self.__tableViewSelectionModel = self.__ui.tableView.selectionModel()
         self.__tableViewSelectionModel.currentRowChanged.connect(self.rowChanged)
+        self.__ui.tableView.installEventFilter(self)
 
         #setup crud & navigation
         self.__ui.toolbCrud.addWidget(self.__ui.txtSearch)
         self.__ui.toolbCrud.addAction(self.__ui.actionFind)
-        self.__ui.toolbCrud.addAction(self.__ui.actionDelete)
+        #self.__ui.toolbCrud.addAction(self.__ui.actionDelete)
         self.__ui.actionFind.triggered.connect(self.find)
         self.__ui.txtSearch.returnPressed.connect(self.find)
         self.__ui.txtSearch.textChanged.connect(lambda: self.find(True))
         self.__ui.actionNewRecord.triggered.connect(self.actionAdd)
-        self.__ui.actionDelete.triggered.connect(self.actionDelete)
+        #self.__ui.actionDelete.triggered.connect(self.actionDelete)
         self.__ui.actionFirst.triggered.connect(self.actionFirst)
         self.__ui.actionPrev.triggered.connect(self.actionPrev)
         self.__ui.actionNext.triggered.connect(self.actionNext)
         self.__ui.actionLast.triggered.connect(self.actionLast)
 
+        self.__previousRow = QtCore.QModelIndex()
+        self.__counterWarnAppFailed = 0
+
+    def eventFilter(self, QObject, QEvent):
+        if QEvent.type() == QEvent.KeyPress:
+            if QEvent.key() == QtCore.Qt.Key_Delete:
+                self.actionDelete()
+                return True
+        return False
+
     def find(self, textChanged = False):
         # find text & update the rowCount lbl
         if textChanged == True and len(self.__ui.txtSearch.text()) == 0:
             self.__modelInterface.search(self.__ui.txtSearch.text())
-            self.updateRowCountLbl()
             self.actionNext()
 
-        if textChanged == False:
+        elif textChanged == False: # textChanged == False:
             self.__modelInterface.search(self.__ui.txtSearch.text())
-            self.updateRowCountLbl()
             self.actionNext()
+
+        self.updateRowCountLbl()
 
     def delegateCommitData(self):
         # add a new blank row when the last one is used
@@ -45,18 +57,35 @@ class ContGeneric(QtCore.QObject):
 
     def rowChanged(self, current=None, previous=None):
         # signal model that the row changed to iniate save & test save for errors
-        saveLst = self.__model.rowChanged(current.row(), previous.row())
-        if saveLst[0] == False:
+        #print(previous.row(), self.__previousRow.row(), self.__previousRow.isValid())
+
+        if previous.row() == -1 and self.__previousRow.row() != -1 and self.__previousRow.isValid():
+            prev = self.__previousRow
+        else:
+            prev = previous
+            self.__previousRow = previous
+        saveLst = self.__model.rowChanged(current.row(), prev.row())
+
+        if saveLst[0] == False and self.__counterWarnAppFailed == 0:
+            #Notfiy user of error & dont move away from the record
             msgbox = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Critical, "Add/Edit Error",
-                                           saveLst[1], QtWidgets.QMessageBox.OK, self.parent())
-            ret = msgbox.exec()
+                                           saveLst[1], QtWidgets.QMessageBox.Ok, self.parent())
+            msgbox.show()
+            QtCore.QTimer.singleShot(0.00001, lambda: self.__ui.tableView.selectRow(previous.row()))
+            QtCore.QTimer.singleShot(0.00001, lambda: self.__ui.tableView.edit(previous))
 
-        if current.row() == self.__model.rowCountActual():
+            self.__counterWarnAppFailed =+ 1
+
+        elif saveLst[0] == False and self.__counterWarnAppFailed > 0:
+            QtCore.QTimer.singleShot(0.00001, lambda: self.__ui.tableView.edit(previous))
+
+        elif current.row() == self.__model.rowCountActual():
+            # reselect the last row after insert so that the tab order work as expected
             self.__ui.tableView.selectRow(current.row())
-        self.updateRowCountLbl()
+            self.__counterWarnAppFailed = 0
 
-        # remove any exccess blank rows
         self.__model.resetNewBlankRows()
+        self.updateRowCountLbl()
 
     def updateRowCountLbl(self):
         # update view recordNr lable
@@ -96,14 +125,14 @@ class ContGeneric(QtCore.QObject):
                     #error - display it
                     msgbox = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Critical, "Delete Error", removeRowsLst[1],
                                                    QtWidgets.QMessageBox.Ok, self.parent())
-                    msgbox.exec()
+                    msgbox.show()
 
         else:
             # no selection
             msgbox = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Warning, "No Selection",
                                            "Nothing is selected, please select a row and try again",
                                            QtWidgets.QMessageBox.Ok, self.__parent)
-            msgbox.exec_()
+            msgbox.show()
 
     def actionFirst(self):
         self.__ui.tableView.selectRow(0)

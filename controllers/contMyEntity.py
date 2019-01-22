@@ -1,5 +1,5 @@
 from PyQt5 import QtWidgets
-import views.viewEntity
+import views.viewSingleTable
 import controllers._contGeneric
 import controllers._contGenericEntity
 import models.modelMyEntity
@@ -8,9 +8,9 @@ class ContMyEntity(QtWidgets.QMainWindow):
     def __init__(self, parent):
         QtWidgets.QMainWindow.__init__(self, parent)
         #setup ui & models & create the generic controller
-        self.__ui = views.viewEntity.Ui_MainWindow()
+        self.__ui = views.viewSingleTable.Ui_MainWindow()
         self.__ui.setupUi(self)
-        self.__modelInterface = models.modelMyEntity.ModelMyEntityInterface()
+        self.__modelInterface = models.modelMyEntity.ModelMyEntityInterface(self)
         self.__model = self.__modelInterface.getModel()
         self.__contGeneric = controllers._contGeneric.ContGeneric(self.__ui, self.__modelInterface, self.__model, self)
         self.__contGenericEntity = controllers._contGenericEntity.ContGenericEntity(self.__ui, self.__contGeneric, self)

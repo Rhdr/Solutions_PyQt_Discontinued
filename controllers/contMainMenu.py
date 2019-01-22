@@ -6,7 +6,8 @@ import utilityClasses.utilityFunctions
 
 class ContMainMenu(QtWidgets.QMainWindow):
     def __init__(self, parent = None):
-        QtWidgets.QMainWindow.__init__(self, parent)
+        super(ContMainMenu, self).__init__(parent)
+        #QtWidgets.QMainWindow.__init__(self, parent)
         self.__ui = views.viewMainMenu.Ui_MainWindow()
         self.__ui.setupUi(self)
         self.__p = utilityClasses.paletteFunctions.Pallet()
@@ -18,7 +19,7 @@ class ContMainMenu(QtWidgets.QMainWindow):
         self.__ui.actionMbiWindowView.triggered.connect(self.actionMbiWindowView)
 
         self.__lastConnectionStatus = False     #used to see last conn status; faster than checking connection again
-        self.__conn = models._databaseConnection.DBConnection()
+        self.__conn = models._databaseConnection.DBConnection(self)
         self.__checkConnectionStatus()
 
     def refreshMDIView(self):
@@ -76,7 +77,13 @@ class ContMainMenu(QtWidgets.QMainWindow):
                 self.__subWindow.show()
 
             elif item.text(column) == "Property":
-                print("Property clicked")
+                #Property
+                import controllers.contProperty
+                self.__subWindow = controllers.contProperty.ContProperty(self)
+                self.__ui.mdiArea.addSubWindow(self.__subWindow)
+                windowsLst = self.__ui.mdiArea.subWindowList()
+                windowsLst[len(windowsLst) - 1].resize(700,600)
+                self.__subWindow.show()
 
             elif item.text(column) == "Finances/Accounting":
                 import controllers.contDlgSelectMyEntity

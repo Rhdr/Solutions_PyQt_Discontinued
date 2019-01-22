@@ -1,4 +1,4 @@
-from PyQt5 import QtSql
+from PyQt5 import QtSql, QtCore, QtWidgets
 
 class Node:
     def __init__(self, data = None, next = None):
@@ -146,19 +146,110 @@ class LinkedListOfListsNoDuplicates(LinkedListOfLists):
             self.removeNode(data[dupplicateColCheck], dupplicateColCheck)
         super(LinkedListOfListsNoDuplicates, self).addFront(data)
 
+class SQLQueryCRUDObject(QtCore.QObject):
+    def __init__(self, headersLst, db, parent):
+        super(SQLQueryCRUDObject, self).__init__(parent)
+
+        if type(db) == QtSql.QSqlDatabase:
+            self.db = db
+        else:
+            raise Exception("db is not a QSqlDatabase")
+
+        self.headersLst = self.__testForList(headersLst)
+        self.headersLstLen = len(headersLst)
+
+        self.selectQ = ""
+
+        self.appendQ = ""
+        self.appendQBindLst = []
+        self.appendQDefaultValueLst = []
+
+        self.updateQ = ""
+        self.updateQBindLst = []
+        self.updateQDefaultValueLst = []
+
+        self.deleteQ = ""
+        self.deleteQBindLst = []
+
+    def __testForStr(self, s):
+        if type(s) == str:
+            return s
+        else:
+            raise Exception("s is not a string, its a ", type(s))
+
+    def __testForList(self, l):
+        if type(l) == list:
+            return l
+        else:
+            raise Exception("l is not a list, its a ", type(l))
+
+    def setSelectQ(self, q):
+        self.selectQ = self.__testForStr(q)
+
+    def setAppendQ(self, q, qBindLst, qDefaultValueLst):
+        #if len(qBindLst) == self.headersLstLen:
+        self.appendQ = self.__testForStr(q)
+        self.appendQBindLst = self.__testForList(qBindLst)
+        self.appendQDefaultValueLst = self.__testForList(qDefaultValueLst)
+        #else:
+        #    print(self.errBindNotMatching())
+        #    raise Exception(self.errBindNotMatching())
+
+    def setUpdateQ(self, q, qBindLst, qDefaultValueLst):
+        #if len(qBindLst) == self.headersLstLen:
+        self.updateQ = self.__testForStr(q)
+        self.updateQBindLst = self.__testForList(qBindLst)
+        self.updateQDefaultValueLst = self.__testForList(qDefaultValueLst)
+        #else:
+        #    print(self.errBindNotMatching())
+        #    raise Exception(self.errBindNotMatching())
+
+    def setDeleteQ(self, q, qBindLst):
+        self.deleteQ = self.__testForStr(q)
+        self.deleteQBindLst = self.__testForList(qBindLst)
+
+    def allSet(self):
+        s = len(self.selectQ)
+        a = len(self.appendQ)
+        u = len(self.updateQ)
+        d = len(self.deleteQ)
+
+        if s > 0 and a > 0 and u > 0 and d > 0:
+            return True
+        else:
+            return False
+
+    def errBindNotMatching(self):
+        e = "Error: Query bind list length does not match the header list length"
+        return e
+
 class QSqlQueryExt(QtSql.QSqlQuery):
     def __init__(self, db):
         super(QSqlQueryExt, self).__init__(db)
 
-    def prepareNBindLst(self, p_lst, bindRecord):
-        #prepare a query list where 1st value == query, next+ == bindings
-        self.prepare(p_lst[0])
-        for i in range(len(p_lst)):
-            if i > 0:  #because first value is the query
-                f = bindRecord.field(bindRecord.indexOf(p_lst[i]))
-                bindValue = f.value()
-                bind = ":" + p_lst[i]
-                self.bindValue(bind, bindValue)
+    def prepareNBindLst(self, q, qBindLst, dirtyRecord):
+        #prepare a query & bind values & handel null values
+        self.prepare(q)
+        for i in range(len(qBindLst)):
+            f = dirtyRecord.field(dirtyRecord.indexOf(qBindLst[i]))
+            bindValue = f.value()
+            name = f.name()
+            name = name[:2].lower()
+            if name == "fk" or name == "pk":
+                if bindValue == 0:
+                    bindValue = QtCore.QVariant(QtCore.QVariant.Int)
+            bind = ":" + qBindLst[i]
+
+            self.bindValue(bind, bindValue)
+
+
+    def getLastExecutedQuery(self):
+        #resolve lastQuery bind values
+        sql = str(self.lastQuery())
+        dictBoundValues = self.boundValues()
+        for key, value in dictBoundValues.items():
+            sql = sql.replace(str(key), str(value))
+        return sql
 
 def except_hook(cls, exception, traceback):
     sys.__excepthook__(cls, exception, traceback)

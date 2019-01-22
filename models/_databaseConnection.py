@@ -1,7 +1,10 @@
 from PyQt5 import QtSql, QtCore
 import mysql.connector
 
-class DBConnection(object):
+class DBConnection(QtCore.QObject):
+    def __init__(self, parent):
+        super(DBConnection, self).__init__(parent)
+
     __connectionOpen = False    #holds connection status open = True / closed = false
     _db = QtSql.QSqlDatabase()
     def connect(self):
@@ -51,13 +54,15 @@ class DBConnection(object):
             #intentionally left blank
             pass
 
-
+def except_hook(cls, exception, traceback):
+    sys.__excepthook__(cls, exception, traceback)
 if __name__ == "__main__":
     from PyQt5 import QtWidgets
     import sys
+    sys.excepthook = except_hook
     app = QtWidgets.QApplication(sys.argv)
-
-    conn = DBConnection()
+    p = QtWidgets.QWidget()
+    conn = DBConnection(p)
     conn.connect()
     print("Connected: " + str(conn.connect()))
     conn.closeConnection()

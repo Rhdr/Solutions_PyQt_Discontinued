@@ -1,0 +1,1 @@
+pyuic5 -x viewSingleTable.ui -o viewSingleTable.pyw

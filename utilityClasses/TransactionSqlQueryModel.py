@@ -2,37 +2,27 @@ from PyQt5 import QtSql, QtWidgets, QtCore, QtGui
 import utilityClasses.dataStructures
 
 class TransactionSqlQueryModel(QtSql.QSqlQueryModel):
-    def __init__(self, headersLst, selectQ, appQueryNBindList, updQueryNBindList, deleteQueryNBindLst, db, parent = None):
-        QtSql.QSqlQueryModel.__init__(self, parent)
-        self.__headers = headersLst
-        self.__db = db
+    def __init__(self, sqlQueryCRUDObject, parent):
+        super(TransactionSqlQueryModel, self).__init__(parent)
+        self.__sqlQueryCRUDObject = sqlQueryCRUDObject
         self.__dirty = False
         self.__newRowCount = 1
         self.__dirtyRecord = QtSql.QSqlRecord()
-        self.__appQueryNBindList = appQueryNBindList
-        self.__updQueryNBindList = updQueryNBindList
-        self.__deleteQueryNBindLst = deleteQueryNBindLst
+        self.__currentRow = -1
         self.__currentRowIndex = 0
         self.__llOrderBy = utilityClasses.dataStructures.LinkedListOfListsNoDuplicates()
-
-        self.setQuery(selectQ)
-
+        self.setQuery(self.__sqlQueryCRUDObject.selectQ)
 
     def data(self, index, role):
         if role == QtCore.Qt.EditRole:
             #return cell contents on edit
             if self.__dirty == True:
+                #f = self.__dirtyRecord.field(index.column())
                 return self.__dirtyRecord.field(index.column()).value()
             else:
                 return super(TransactionSqlQueryModel, self).data(index, role)
 
         if role == QtCore.Qt.DisplayRole:
-            #displayed data for each cell
-            #if self.rowCountActual() == index.row() and self.__currentRowIndex == index.row():
-            #    return self.__dirtyRecord.field(index.column()).value()
-            #else:
-            #    return super(TransactionSqlQueryModel, self).data(index, role)
-
             #displayed data for each cell & return the keyword New for newly added records
             if self.__dirty == True and self.__currentRowIndex == index.row():
                 return self.__dirtyRecord.field(index.column()).value()
@@ -53,8 +43,8 @@ class TransactionSqlQueryModel(QtSql.QSqlQueryModel):
         if role == QtCore.Qt.DisplayRole:
             if qt_Orientation == QtCore.Qt.Horizontal:
                 # column lables
-                if len(self.__headers) == self.columnCount():
-                    return self.__headers[pos]
+                if self.__sqlQueryCRUDObject.headersLstLen == self.columnCount():
+                    return self.__sqlQueryCRUDObject.headersLst[pos]
                 else:
                     return "Incorrect header count, there should be " + str(self.columnCount() + " headers")
             else:
@@ -68,7 +58,8 @@ class TransactionSqlQueryModel(QtSql.QSqlQueryModel):
 
     def rowChanged(self, currentRow, previousRow):
         #save record & record nr/index on rowchange, controllers need to connect their views to the rowChanged method
-        self.__dirtyRecord = self.record(currentRow)
+        #self.__dirtyRecord = self.record(currentRow)
+        self.updateDirtyRecord(currentRow)
         self.__currentRowIndex = currentRow
         return self.save(previousRow)
 
@@ -98,27 +89,28 @@ class TransactionSqlQueryModel(QtSql.QSqlQueryModel):
             else:
                 #print("Editing")
                 rowLst = self.editRow()
-                if rowLst[0] == True:  #test for any errors
+                if rowLst[0] == True:   #test for any errors
                     self.__dirty = False
-            self.__dirtyRecord = self.record()
-
+            #self.__dirtyRecord = self.record()
+            #self.updateDirtyRecord()
             return rowLst
         else:
             return [True]
 
-
     def editRow(self):
-        self.__db.transaction()
-        q = utilityClasses.dataStructures.QSqlQueryExt(self.__db)
-        q.prepareNBindLst(self.__updQueryNBindList, self.__dirtyRecord)
+        self.__sqlQueryCRUDObject.db.transaction()
+        q = utilityClasses.dataStructures.QSqlQueryExt(self.__sqlQueryCRUDObject.db)
+        q.prepareNBindLst(self.__sqlQueryCRUDObject.updateQ, self.__sqlQueryCRUDObject.updateQBindLst , self.__dirtyRecord)
         q.exec()
-        self.__db.commit()
+        self.__sqlQueryCRUDObject.db.commit()
+        #print(q.lastQuery())
         self.requery()
+        q.getLastExecutedQuery()
 
         if q.lastError().number() > 0:
-            self.__db.rollback()
+            self.__sqlQueryCRUDObject.db.rollback()
             print("SQL Model removeRows Error")
-            print(q.executedQuery())
+            print(q.getLastExecutedQuery ())
             err = q.lastError().text()
             print(err)
             return [False, err]
@@ -129,40 +121,47 @@ class TransactionSqlQueryModel(QtSql.QSqlQueryModel):
         pos = self.rowCount()
 
         self.beginInsertRows(parent, pos, pos + rows - 1)
-        self.__db.transaction()
-        q = utilityClasses.dataStructures.QSqlQueryExt(self.__db)
-        q.prepareNBindLst(self.__appQueryNBindList, self.__dirtyRecord)
+        self.__sqlQueryCRUDObject.db.transaction()
+        q = utilityClasses.dataStructures.QSqlQueryExt(self.__sqlQueryCRUDObject.db)
+        q.prepareNBindLst(self.__sqlQueryCRUDObject.appendQ, self.__sqlQueryCRUDObject.appendQBindLst, self.__dirtyRecord)
         q.exec()
-        self.__db.commit()
+        self.__sqlQueryCRUDObject.db.commit()
         self.endInsertRows()
         self.requery()
 
         if q.lastError().number() > 0:
-            self.__db.rollback()
+            self.__sqlQueryCRUDObject.db.rollback()
             print("SQL Model insertRow Error")
-            print(q.executedQuery())
+            print(q.getLastExecutedQuery())
             err = q.lastError().text()
             print(err)
             return [False, err]
         return [True]
 
+    def updateDirtyRecord(self, row = -1):
+        if row != -1:
+            self.__dirtyRecord = self.record(row)
+        else:
+            self.__dirtyRecord = self.record()
+
     def removeRows(self, pos, rows, parent = QtCore.QModelIndex()):
         self.beginRemoveRows(parent, pos, pos + rows - 1)
         for i in range(rows):
-            self.__dirtyRecord = self.record(pos + i)
-            self.__db.transaction()
-            q = utilityClasses.dataStructures.QSqlQueryExt(self.__db)
-            q.prepareNBindLst(self.__deleteQueryNBindLst, self.__dirtyRecord)
+            #self.__dirtyRecord = self.record(pos + i)
+            self.updateDirtyRecord(pos + i)
+            self.__sqlQueryCRUDObject.db.transaction()
+            q = utilityClasses.dataStructures.QSqlQueryExt(self.__sqlQueryCRUDObject.db)
+            q.prepareNBindLst(self.__sqlQueryCRUDObject.deleteQ, self.__sqlQueryCRUDObject.deleteQBindLst, self.__dirtyRecord)
             q.exec()
-            self.__db.commit()
-        self.__dirtyRecord = self.record()
+            self.__sqlQueryCRUDObject.db.commit()
+        self.updateDirtyRecord()
         self.endRemoveRows()
         self.requery()
 
         if q.lastError().number() > 0:
-            self.__db.rollback()
+            self.__sqlQueryCRUDObject.db.rollback()
             print("SQL Model removeRows Error")
-            print(q.executedQuery())
+            print(q.getLastExecutedQuery())
             err = q.lastError().text()
             print(err)
             return [False, err]
@@ -180,9 +179,21 @@ class TransactionSqlQueryModel(QtSql.QSqlQueryModel):
 
     def __printDirtyRecord(self):
         print("Printing dirty Record")
-        for i in range(self.__dirtyRecord.count()):
-            f = self.__dirtyRecord.field(i)
-            print(f.name(), ":", f.value())
+        for i in range(len(self.__dirtyRecord)):
+            field = self.__dirtyRecord.field(i)
+            print("---------- field", i, field.name(), "--------")
+            print("default value", field.defaultValue())
+            print("is auto value", field.isAutoValue())
+            print("is generated", field.isGenerated())
+            print("is null", field.isNull())
+            print("is read only", field.isReadOnly())
+            print("is valid", field.isValid())
+            print("length", field.length())
+            print("precision", field.precision())
+            print("required status", field.requiredStatus())
+            print("type", field.type())
+            print("type id", field.typeID())
+            print("value", field.value())
 
     def orderBy(self, colIndex, order):
         # remove the curent orderby, determine the new order then build sql & execute (sort)
@@ -223,7 +234,7 @@ class TransactionSqlQueryModel(QtSql.QSqlQueryModel):
             if strOrder != "":
                 strOrder = strOrder + ", "
 
-            strOrder = strOrder + self.__headers[column] + order
+            strOrder = strOrder + self.__sqlQueryCRUDObject.headersLst[column] + order
             itr = itr.next
             i += 1
 
@@ -237,8 +248,6 @@ class TransactionSqlQueryModel(QtSql.QSqlQueryModel):
 
         strQ = currentQueryNoOrder + orderBy + strOrder
         super(TransactionSqlQueryModel, self).setQuery(strQ)
-        #print(strQ)
-
 
 def except_hook(cls, exception, traceback):
     sys.__excepthook__(cls, exception, traceback)
