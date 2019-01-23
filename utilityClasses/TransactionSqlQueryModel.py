@@ -128,7 +128,7 @@ class TransactionSqlQueryModel(QtSql.QSqlQueryModel):
         self.__sqlQueryCRUDObject.db.commit()
         self.endInsertRows()
         self.requery()
-
+        print(q.getLastExecutedQuery())
         if q.lastError().number() > 0:
             self.__sqlQueryCRUDObject.db.rollback()
             print("SQL Model insertRow Error")
@@ -176,6 +176,10 @@ class TransactionSqlQueryModel(QtSql.QSqlQueryModel):
 
     def searchSQL(self, searchSQL):
         self.setQuery(searchSQL)
+        '''q = utilityClasses.dataStructures.QSqlQueryExt(self.__sqlQueryCRUDObject.db)
+        q.prepare(searchSQL)
+        q.exec()
+        print(q.getLastExecutedQuery())'''
 
     def __printDirtyRecord(self):
         print("Printing dirty Record")

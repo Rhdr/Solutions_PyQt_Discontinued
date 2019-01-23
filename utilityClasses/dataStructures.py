@@ -183,12 +183,20 @@ class SQLQueryCRUDObject(QtCore.QObject):
         else:
             raise Exception("l is not a list, its a ", type(l))
 
+    def __testStrForEndingSemicolon(self, s):
+        if s[-1] == ";":
+            return s
+        else:
+            raise Exception("s is not ending in a ; but with", s[-1])
+
     def setSelectQ(self, q):
         self.selectQ = self.__testForStr(q)
+        self.selectQ = self.__testStrForEndingSemicolon(q)
 
     def setAppendQ(self, q, qBindLst, qDefaultValueLst):
         #if len(qBindLst) == self.headersLstLen:
         self.appendQ = self.__testForStr(q)
+        self.appendQ = self.__testStrForEndingSemicolon(q)
         self.appendQBindLst = self.__testForList(qBindLst)
         self.appendQDefaultValueLst = self.__testForList(qDefaultValueLst)
         #else:
@@ -198,6 +206,7 @@ class SQLQueryCRUDObject(QtCore.QObject):
     def setUpdateQ(self, q, qBindLst, qDefaultValueLst):
         #if len(qBindLst) == self.headersLstLen:
         self.updateQ = self.__testForStr(q)
+        self.updateQ = self.__testStrForEndingSemicolon(q)
         self.updateQBindLst = self.__testForList(qBindLst)
         self.updateQDefaultValueLst = self.__testForList(qDefaultValueLst)
         #else:
@@ -206,6 +215,7 @@ class SQLQueryCRUDObject(QtCore.QObject):
 
     def setDeleteQ(self, q, qBindLst):
         self.deleteQ = self.__testForStr(q)
+        self.deleteQ = self.__testStrForEndingSemicolon(q)
         self.deleteQBindLst = self.__testForList(qBindLst)
 
     def allSet(self):
@@ -244,12 +254,49 @@ class QSqlQueryExt(QtSql.QSqlQuery):
 
 
     def getLastExecutedQuery(self):
-        #resolve lastQuery bind values
+        #resolve executedQuery bind values, prevent sql injection & "?" being intepreted wrongly
+        sql = str(self.executedQuery())
+
+        for i in range(len(self.boundValues())):
+            var = QtCore.QVariant(self.boundValue(i))
+            field = QtSql.QSqlField("", var.type())
+            field.setValue(var)
+
+            formatV = self.driver().formatValue(field)
+
+            #insert the pos of all the substrings into the subStringsPos list
+            subStringsPos = []
+            startingPos = 0
+            nrOfSubstrings = int(sql.count("\"") / 2)
+            for x in range(nrOfSubstrings):
+                openQuotePos = sql.index("\"", startingPos)
+                closedQuotePos = sql.index("\"", openQuotePos + 1)
+                subStringsPos.append(openQuotePos)
+                subStringsPos.append(closedQuotePos)
+                startingPos = closedQuotePos + 1
+
+            #check each ? if it falls into a substring dont replace otherwise replace with bind value
+            nrOfQuestionMarks = sql.count("?")
+            startingPos = 0
+            x = 0
+            for z in range(nrOfQuestionMarks):
+                posOfQuestionMark = sql.index("?", startingPos)
+
+                if len([]) == 0 or not (posOfQuestionMark >= subStringsPos[x] and posOfQuestionMark <= subStringsPos[x + 1]):
+                    sql = sql.replace("?", formatV, 1)
+                    break
+                x += 2
+                startingPos = posOfQuestionMark + 1
+
+        return sql
+
+        ''' Old soluiton - warning vulnarble to sql injection
         sql = str(self.lastQuery())
         dictBoundValues = self.boundValues()
         for key, value in dictBoundValues.items():
             sql = sql.replace(str(key), str(value))
         return sql
+        '''
 
 def except_hook(cls, exception, traceback):
     sys.__excepthook__(cls, exception, traceback)

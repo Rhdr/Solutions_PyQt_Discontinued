@@ -15,7 +15,9 @@ class ModelPropertyOwnerInterface(models._databaseConnection.DBConnection):
         sqlQueryCRUDObject.setSelectQ(selectQ)
 
         appQ = """INSERT INTO entity(Import_OldPk, Import_OldType, Name, Surname, Initials, UserName, MonthlyStatement) 
-                    VALUES(0, 0, :Name, :Surname, :Initials, :UserName, :MonthlyStatement);"""
+                    VALUES(0, 0, :Name, :Surname, :Initials, :UserName, :MonthlyStatement);
+                  INSERt INTO propertyowner(propertyowner.Pk_PropertOwnerID, propertyowner.Import_OldPk_PropertOwnerID)
+                    VALUES(LAST_INSERT_ID(), 0);"""
         appBindLst = ["Name", "Surname", "Initials", "UserName", "MonthlyStatement"]
         appDefaultValueLst = []
         sqlQueryCRUDObject.setAppendQ(appQ, appBindLst, appDefaultValueLst)
@@ -40,7 +42,7 @@ class ModelPropertyOwnerInterface(models._databaseConnection.DBConnection):
     def search(self, searchVal):
         self.__model.searchSQL("""SELECT entity.Pk_EntityID, entity.Name, entity.Surname, entity.Initials, entity.UserName, entity.MonthlyStatement
                                   FROM entity
-                                  WHERE entity.Name Like '%""" + searchVal + """%' OR entity.Surname Like '%""" + searchVal + """%' OR entity.Initials Like '%""" + searchVal + """%' OR entity.UserName Like '%""" + searchVal + """%'""")
+                                  WHERE entity.Name Like '%""" + searchVal + """%' OR entity.Surname Like '%""" + searchVal + """%' OR entity.Initials Like '%""" + searchVal + """%' OR entity.UserName Like '%""" + searchVal + """%';""")
 
 def except_hook(cls, exception, traceback):
     sys.__excepthook__(cls, exception, traceback)
