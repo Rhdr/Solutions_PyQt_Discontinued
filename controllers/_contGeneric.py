@@ -1,10 +1,107 @@
 from PyQt5 import QtWidgets, QtCore
 
-class ContGeneric(QtCore.QObject):
+class ContGeneric_Form(QtCore.QObject):
+    def __init__(self, uiForm, uiFormDetail, model, mapper, parent):
+        super(ContGeneric_Form, self).__init__(parent)
+        self.parent = parent
+        self.__previousRow = -1
+        self.__counterWarnAppFailed = 0
+
+        self.__uiForm = uiForm
+        self.__uiForm.setupUi(parent)
+        self.__uiForm.toolbCrud.addWidget(self.__uiForm.cmbSearch)
+        self.__uiForm.toolbCrud.addAction(self.__uiForm.actionSearch)
+
+        vlayout = self.__uiForm.verticalLayout
+        widgetFromDetail = QtWidgets.QWidget(parent)
+        vlayout.addWidget(widgetFromDetail)
+        self.__uiFormDetail = uiFormDetail
+        self.__uiFormDetail.setupUi(widgetFromDetail)
+
+        self.__model = model
+        self.__mapper = mapper
+        self.__mapper.setSubmitPolicy(QtWidgets.QDataWidgetMapper.ManualSubmit)
+
+        # setup search cmbbox
+        self.__uiForm.cmbSearch.setModel(self.__model)
+        self.__uiForm.cmbSearch.setModelColumn(10)
+        self.__uiForm.cmbSearch.setEditable(True)
+
+        #connections
+        self.__uiForm.actionNewRecord.triggered.connect(self.actionAdd)
+        self.__uiForm.actionSearch.triggered.connect(self.search)
+        #self.__uiForm.txtSearch.returnPressed.connect(self.find)
+        #self.__uiForm.txtSearch.textChanged.connect(lambda: self.find(True))
+        self.__uiForm.actionNewRecord.triggered.connect(self.actionAdd)
+        #self.__ui.actionDelete.triggered.connect(self.actionDelete)
+        self.__uiForm.actionFirst.triggered.connect(self.actionFirst)
+        self.__uiForm.actionPrev.triggered.connect(self.actionPrev)
+        self.__uiForm.actionNext.triggered.connect(self.actionNext)
+        self.__uiForm.actionLast.triggered.connect(self.actionLast)
+        self.__mapper.currentIndexChanged.connect(self.rowChanged)
+        self.__uiForm.cmbSearch.currentIndexChanged.connect(self.search)
+
+        self.updateRowCountLbl()
+
+    def rowChanged(self, current=None):
+        # signal model that the row changed to iniate save & test save for errors
+        # print(previous.row(), self.__previousRow.row(), self.__previousRow.isValid())
+        if self.__previousRow < 0:
+            self.__previousRow == current
+        saveLst = self.__model.rowChanged(current, self.__previousRow)
+        if current != self.__previousRow:
+            self.__previousRow = current
+
+        if saveLst[0] == False and self.__counterWarnAppFailed == 0:
+            # Notfiy user of error & dont move away from the record
+            msgbox = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Critical, "Add/Edit Error",
+                                           saveLst[1], QtWidgets.QMessageBox.Ok, self.parent())
+            msgbox.show()
+            QtCore.QTimer.singleShot(0.00001, lambda: self.__ui.tableView.selectRow(self.__previous.row()))
+            QtCore.QTimer.singleShot(0.00001, lambda: self.__ui.tableView.edit(self.__previous))
+
+            self.__counterWarnAppFailed = + 1
+
+        elif saveLst[0] == False and self.__counterWarnAppFailed > 0:
+            QtCore.QTimer.singleShot(0.00001, lambda: self.__ui.tableView.edit(self.__previous))
+
+        self.__model.resetNewBlankRows()
+        self.updateRowCountLbl()
+
+    def updateRowCountLbl(self):
+        # update view recordNr lable
+        currentRow = str(self.__mapper.currentIndex() + 1)
+        rowCount = str(self.__model.rowCountActual())
+        self.__uiForm.actionRecordNr.setText("Record " + currentRow + " of " + rowCount)
+
+    def search(self, row):
+        self.__mapper.setCurrentIndex(row)
+        self.__uiForm.cmbSearch.setCurrentIndex(-1)
+
+    def actionAdd(self):
+        # add new row to bottom of table
+        self.__mapper.toLast()
+
+    def actionFirst(self):
+        self.__mapper.toFirst()
+
+    def actionPrev(self):
+        self.__mapper.toPrevious()
+
+    def actionNext(self):
+        self.__mapper.toNext()
+
+    def actionLast(self):
+        # last record may be blank used to add more records
+        self.__mapper.setCurrentIndex(self.__model.rowCountActual() - 1)
+
+
+class ContGeneric_Table(QtCore.QObject):
     def __init__(self, ui, modelInterface, model, parent):
         #QtCore.QObject.__init__(self, parent)
-        super(ContGeneric, self).__init__(parent)
+        super(ContGeneric_Table, self).__init__(parent)
         self.__ui = ui
+        self.__ui.setupUi(parent)
         self.__modelInterface = modelInterface
         self.__model = model
         self.__parent = parent
@@ -16,11 +113,11 @@ class ContGeneric(QtCore.QObject):
 
         #setup crud & navigation
         self.__ui.toolbCrud.addWidget(self.__ui.txtSearch)
-        self.__ui.toolbCrud.addAction(self.__ui.actionFind)
+        self.__ui.toolbCrud.addAction(self.__ui.actionSearch)
         #self.__ui.toolbCrud.addAction(self.__ui.actionDelete)
-        self.__ui.actionFind.triggered.connect(self.find)
-        self.__ui.txtSearch.returnPressed.connect(self.find)
-        self.__ui.txtSearch.textChanged.connect(lambda: self.find(True))
+        self.__ui.actionSearch.triggered.connect(self.search)
+        self.__ui.txtSearch.returnPressed.connect(self.search)
+        self.__ui.txtSearch.textChanged.connect(lambda: self.search(True))
         self.__ui.actionNewRecord.triggered.connect(self.actionAdd)
         #self.__ui.actionDelete.triggered.connect(self.actionDelete)
         self.__ui.actionFirst.triggered.connect(self.actionFirst)
@@ -31,6 +128,8 @@ class ContGeneric(QtCore.QObject):
         self.__previousRow = QtCore.QModelIndex()
         self.__counterWarnAppFailed = 0
 
+        self.updateRowCountLbl()
+
     def eventFilter(self, QObject, QEvent):
         if QEvent.type() == QEvent.KeyPress:
             if QEvent.key() == QtCore.Qt.Key_Delete:
@@ -38,7 +137,7 @@ class ContGeneric(QtCore.QObject):
                 return True
         return False
 
-    def find(self, textChanged = False):
+    def search(self, textChanged = False):
         # find text & update the rowCount lbl
         if textChanged == True and len(self.__ui.txtSearch.text()) == 0:
             self.__modelInterface.search(self.__ui.txtSearch.text())
@@ -153,3 +252,19 @@ class ContGeneric(QtCore.QObject):
         self.actionNext()
         self.__model.save(self.__tableViewSelectionModel.currentIndex().row())
         # event.iqnore()
+
+
+import utilityClasses.delegates
+class ContGeneric_TableEntity(QtCore.QObject):
+    def __init__(self, ui, contGeneric, parent):
+        QtCore.QObject.__init__(self, parent)
+        # setup & link delegates
+        lineEditDelegate = utilityClasses.delegates.LineEditDelegate(ui.tableView)
+        spinBoxDelegate = utilityClasses.delegates.SpinBoxDelegate(ui.tableView)
+        ui.tableView.setItemDelegateForColumn(1, lineEditDelegate)
+        ui.tableView.setItemDelegateForColumn(2, lineEditDelegate)
+        ui.tableView.setItemDelegateForColumn(3, lineEditDelegate)
+        ui.tableView.setItemDelegateForColumn(4, lineEditDelegate)
+        ui.tableView.setItemDelegateForColumn(5, spinBoxDelegate)
+        spinBoxDelegate.commitData.connect(contGeneric.delegateCommitData)
+        lineEditDelegate.commitData.connect(contGeneric.delegateCommitData)

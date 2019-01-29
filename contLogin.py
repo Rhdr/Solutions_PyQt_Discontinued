@@ -11,7 +11,7 @@ class ContLogin(QtWidgets.QDialog):
         self.__ui = views.viewLogin.Ui_qdlgLogin()
         self.__ui.setupUi(self)
         self.__p = utilityClasses.paletteFunctions.Pallet()
-        self.__conn = models._databaseConnection.DBConnection()
+        self.__conn = models._databaseConnection.DBConnection(self)
 
         #setup signals
         self.__ui.btnLogin.clicked.connect(self.__login)

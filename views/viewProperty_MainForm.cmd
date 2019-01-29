@@ -1,0 +1,1 @@
+pyuic5 -x viewProperty_MainForm.ui -o viewProperty_MainForm.pyw

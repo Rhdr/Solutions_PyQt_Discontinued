@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'viewEntity.ui'
+# Form implementation generated from reading ui file '_viewForm.ui'
 #
 # Created by: PyQt5 UI code generator 5.11.2
 #
@@ -11,22 +11,19 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(761, 614)
+        MainWindow.resize(736, 614)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.txtSearch = QtWidgets.QLineEdit(self.centralwidget)
-        self.txtSearch.setClearButtonEnabled(True)
-        self.txtSearch.setObjectName("txtSearch")
-        self.verticalLayout.addWidget(self.txtSearch)
-        self.tableView = QtWidgets.QTableView(self.centralwidget)
-        self.tableView.setEditTriggers(QtWidgets.QAbstractItemView.AnyKeyPressed|QtWidgets.QAbstractItemView.DoubleClicked|QtWidgets.QAbstractItemView.EditKeyPressed|QtWidgets.QAbstractItemView.SelectedClicked)
-        self.tableView.setAlternatingRowColors(True)
-        self.tableView.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
-        self.tableView.setSortingEnabled(True)
-        self.tableView.setObjectName("tableView")
-        self.verticalLayout.addWidget(self.tableView)
+        self.cmbSearch = QtWidgets.QComboBox(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.cmbSearch.sizePolicy().hasHeightForWidth())
+        self.cmbSearch.setSizePolicy(sizePolicy)
+        self.cmbSearch.setObjectName("cmbSearch")
+        self.verticalLayout.addWidget(self.cmbSearch)
         MainWindow.setCentralWidget(self.centralwidget)
         self.toolbNav = QtWidgets.QToolBar(MainWindow)
         self.toolbNav.setMovable(False)
@@ -34,7 +31,7 @@ class Ui_MainWindow(object):
         self.toolbNav.setObjectName("toolbNav")
         MainWindow.addToolBar(QtCore.Qt.BottomToolBarArea, self.toolbNav)
         self.toolbCrud = QtWidgets.QToolBar(MainWindow)
-        self.toolbCrud.setMovable(True)
+        self.toolbCrud.setMovable(False)
         self.toolbCrud.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
         self.toolbCrud.setObjectName("toolbCrud")
         MainWindow.addToolBar(QtCore.Qt.TopToolBarArea, self.toolbCrud)
@@ -79,17 +76,23 @@ class Ui_MainWindow(object):
         icon6.addPixmap(QtGui.QPixmap(":/CRUD_S/icons/save.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionSave.setIcon(icon6)
         self.actionSave.setObjectName("actionSave")
-        self.actionFind = QtWidgets.QAction(MainWindow)
+        self.actionSearch = QtWidgets.QAction(MainWindow)
         icon7 = QtGui.QIcon()
         icon7.addPixmap(QtGui.QPixmap(":/CRUD_S/icons/search.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionFind.setIcon(icon7)
-        self.actionFind.setObjectName("actionFind")
+        self.actionSearch.setIcon(icon7)
+        self.actionSearch.setObjectName("actionSearch")
+        self.actionswitchView = QtWidgets.QAction(MainWindow)
+        icon8 = QtGui.QIcon()
+        icon8.addPixmap(QtGui.QPixmap(":/navigation/icons/table.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionswitchView.setIcon(icon8)
+        self.actionswitchView.setObjectName("actionswitchView")
         self.toolbNav.addAction(self.actionFirst)
         self.toolbNav.addAction(self.actionPrev)
         self.toolbNav.addAction(self.actionRecordNr)
         self.toolbNav.addAction(self.actionNext)
         self.toolbNav.addAction(self.actionLast)
         self.toolbNav.addAction(self.actionNewRecord)
+        self.toolbNav.addAction(self.actionswitchView)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -110,8 +113,10 @@ class Ui_MainWindow(object):
         self.actionDelete.setToolTip(_translate("MainWindow", "Delete Record/s"))
         self.actionSave.setText(_translate("MainWindow", "Save"))
         self.actionSave.setToolTip(_translate("MainWindow", "Save all Records"))
-        self.actionFind.setText(_translate("MainWindow", "Find"))
-        self.actionFind.setToolTip(_translate("MainWindow", "Find a record"))
+        self.actionSearch.setText(_translate("MainWindow", "Search"))
+        self.actionSearch.setToolTip(_translate("MainWindow", "Search for a record"))
+        self.actionswitchView.setText(_translate("MainWindow", "Switch to Table View"))
+        self.actionswitchView.setToolTip(_translate("MainWindow", "Change the view to Table or Form view"))
 
 import icons_rc
 

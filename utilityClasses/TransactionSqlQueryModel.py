@@ -13,6 +13,9 @@ class TransactionSqlQueryModel(QtSql.QSqlQueryModel):
         self.__llOrderBy = utilityClasses.dataStructures.LinkedListOfListsNoDuplicates()
         self.setQuery(self.__sqlQueryCRUDObject.selectQ)
 
+    def fieldIndex(self, colName):
+        return self.__sqlQueryCRUDObject.headersLst.index(colName)
+
     def data(self, index, role):
         if role == QtCore.Qt.EditRole:
             #return cell contents on edit
@@ -46,7 +49,7 @@ class TransactionSqlQueryModel(QtSql.QSqlQueryModel):
                 if self.__sqlQueryCRUDObject.headersLstLen == self.columnCount():
                     return self.__sqlQueryCRUDObject.headersLst[pos]
                 else:
-                    return "Incorrect header count, there should be " + str(self.columnCount() + " headers")
+                    raise Exception("Incorrect header count, there should be " + str(self.columnCount() + " headers"))
             else:
                 # rows labels
                 if pos <= self.rowCountActual() - 1:

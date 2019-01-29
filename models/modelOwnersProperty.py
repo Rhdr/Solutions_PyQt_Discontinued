@@ -3,35 +3,37 @@ import models._databaseConnection
 import utilityClasses.TransactionSqlQueryModel
 import utilityClasses.dataStructures
 
-class ModelPropertyInterface(models._databaseConnection.DBConnection):
+class ModelOwnersPropertyInterface(models._databaseConnection.DBConnection):
     def __init__(self, parent):
-        super(ModelPropertyInterface, self).__init__(parent)
+        super(ModelOwnersPropertyInterface, self).__init__(parent)
         self.connect()
 
-        headers = ["Pk_PropertyID", "Street", "StreetNr", "Complex", "ComplexNr", "Address", "Town", "Suburb", "Fk_StreetNrID", "Fk_ComplexNrID"]
+        headers = ["Pk_PropertyOwnerID", "Pk_PropertyID"]
         sqlQueryCRUDObject = utilityClasses.dataStructures.SQLQueryCRUDObject(headers, self._db, self)
 
-        selectQ = """SELECT property.Pk_PropertyID, property.Street, property.StreetNr, property.Complex, property.ComplexNr, property.Address, 
-                         property.Town, property.Suburb, property.Fk_StreetNrID, property.Fk_ComplexNrID
-                       FROM property;"""
+        #selectQ = """SELECT entity.Pk_EntityID, entity.Name
+        #                            FROM entity
+        #                            ORDER BY entity.Name;"""
+        selectQ = """SELECT ownersproperty.Pk_PropertyOwnerID, ownersproperty.Pk_PropertyID
+                     FROM ownersproperty;"""
         sqlQueryCRUDObject.setSelectQ(selectQ)
 
-        appQ = """INSERT INTO property(Import_OldPk_PropertyID, Street, StreetNr, Complex, ComplexNr, Address, Town, Suburb, Fk_StreetNrID, Fk_ComplexNrID) 
-                    VALUES(0, :Street, :StreetNr, :Complex, :ComplexNr, :Address, :Town, :Suburb, :Fk_StreetNrID, :Fk_ComplexNrID);"""
-        appBindLst = ["Street", "StreetNr", "Complex", "ComplexNr", "Address", "Town", "Suburb", "Fk_StreetNrID", "Fk_ComplexNrID"]
+        appQ = """INSERT INTO ownersproperty(ownersproperty.Pk_PropertyOwnerID, ownersproperty.Pk_PropertyID) 
+                    VALUES(:Pk_PropertyOwnerID, :Pk_PropertyID);"""
+        appBindLst = ["Pk_PropertyOwnerID", "Pk_PropertyID"]
         appDefaultValueLst = []
         sqlQueryCRUDObject.setAppendQ(appQ, appBindLst, appDefaultValueLst)
 
-        updQ = """UPDATE property SET Street = :Street, StreetNr = :StreetNr, Complex = :Complex, ComplexNr = :ComplexNr, Address = :Address, 
-                      Town = :Town, Suburb = :Suburb, Fk_StreetNrID = :Fk_StreetNrID, Fk_ComplexNrID = :Fk_ComplexNrID 
-                    WHERE Pk_PropertyID = :Pk_PropertyID;"""
-        updQBindLst = ["Street", "StreetNr", "Complex", "ComplexNr", "Address", "Town", "Suburb", "Fk_StreetNrID", "Fk_ComplexNrID", "Pk_PropertyID"]
+        updQ = """UPDATE ownersproperty SET ownersproperty.Pk_PropertyOwnerID = :Pk_PropertyOwnerID, 
+                                            ownersproperty.Pk_PropertyID = :Pk_PropertyID 
+                    WHERE ownersproperty.Pk_PropertyOwnerID = :Pk_PropertyOwnerID;"""
+        updQBindLst = ["Pk_PropertyOwnerID", "Pk_PropertyID"]
         updDefaultValueLst = []
         sqlQueryCRUDObject.setUpdateQ(updQ, updQBindLst, updDefaultValueLst)
 
-        delQ = """DELETE FROM property 
-                    WHERE property.Pk_PropertyID = :Pk_PropertyID;"""
-        delQBindLst = ["Pk_PropertyID"]
+        delQ = """DELETE FROM ownersproperty 
+                    WHERE ownersproperty.Pk_PropertyOwnerID = :Pk_PropertyOwnerID AND ownersproperty.Pk_PropertyID = :Pk_PropertyID;"""
+        delQBindLst = ["Pk_PropertyOwnerID", "Pk_PropertyID"]
         sqlQueryCRUDObject.setDeleteQ(delQ, delQBindLst)
 
         self.__model = utilityClasses.TransactionSqlQueryModel.TransactionSqlQueryModel(sqlQueryCRUDObject, parent)
@@ -58,17 +60,11 @@ class ModelPropertyInterface(models._databaseConnection.DBConnection):
                                   FROM property
                                   WHERE Address Like '%""" + filterVal + """%' OR Town Like '%""" + filterVal + """%' OR Suburb Like '%""" + filterVal + """%;'""")
 
-    def getCmbStreetNrModel(self):
-        '''
+    def getCmbPk_PropertyOwnerID(self):
         model = QtSql.QSqlQueryModel(self)
         model.setQuery("""SELECT entity.Pk_EntityID, entity.Name 
                             FROM entity
                             ORDER BY entity.Name;""")
-        '''
-        model = QtSql.QSqlRelationalTableModel(self)
-        model.setTable("property")
-        model.setRelation(self.__model.fieldIndex("Fk_StreetNrID"), QtSql.QSqlRelation("entity", "Pk_EntityID", "Name"))
-        model.select()
         return model
 
 def except_hook(cls, exception, traceback):
@@ -79,7 +75,7 @@ if __name__ == "__main__":
     from PyQt5 import QtWidgets
     app = QtWidgets.QApplication(sys.argv)
     p = QtWidgets.QWidget()
-    clsModel = ModelPropertyInterface(p)
+    clsModel = ModelOwnersPropertyInterface(p)
     #try:
     clsModel.connect()
     model = clsModel.getModel()

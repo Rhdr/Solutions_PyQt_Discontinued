@@ -62,6 +62,7 @@
    <addaction name="actionNext"/>
    <addaction name="actionLast"/>
    <addaction name="actionNewRecord"/>
+   <addaction name="actionswitchView"/>
   </widget>
   <widget class="QToolBar" name="toolbCrud">
    <property name="windowTitle">
@@ -169,16 +170,28 @@
     <string>Save all Records</string>
    </property>
   </action>
-  <action name="actionFind">
+  <action name="actionSearch">
    <property name="icon">
     <iconset resource="../resources/icons.qrc">
      <normaloff>:/CRUD_S/icons/search.png</normaloff>:/CRUD_S/icons/search.png</iconset>
    </property>
    <property name="text">
-    <string>Find</string>
+    <string>Search</string>
    </property>
    <property name="toolTip">
-    <string>Find a record</string>
+    <string>Search for a record</string>
+   </property>
+  </action>
+  <action name="actionswitchView">
+   <property name="icon">
+    <iconset resource="../resources/icons.qrc">
+     <normaloff>:/navigation/icons/form.png</normaloff>:/navigation/icons/form.png</iconset>
+   </property>
+   <property name="text">
+    <string>Switch to Form View</string>
+   </property>
+   <property name="toolTip">
+    <string>Change the view to Table or Form view</string>
    </property>
   </action>
  </widget>

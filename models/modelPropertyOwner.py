@@ -29,7 +29,9 @@ class ModelPropertyOwnerInterface(models._databaseConnection.DBConnection):
         updDefaultValueLst = []
         sqlQueryCRUDObject.setUpdateQ(updQ, updQBindLst, updDefaultValueLst)
 
-        delQ = """DELETE FROM entity 
+        delQ = """DELETE FROM propertyowner
+                    WHERE propertyowner.Pk_PropertOwnerID = :Pk_EntityID;
+                  DELETE FROM entity 
                     WHERE entity.Pk_EntityID = :Pk_EntityID;"""
         delQBindLst = ["Pk_EntityID"]
         sqlQueryCRUDObject.setDeleteQ(delQ, delQBindLst)

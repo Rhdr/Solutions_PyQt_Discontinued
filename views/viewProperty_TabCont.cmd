@@ -1,0 +1,1 @@
+pyuic5 -x viewProperty_TabCont.ui -o viewProperty_TabCont.pyw

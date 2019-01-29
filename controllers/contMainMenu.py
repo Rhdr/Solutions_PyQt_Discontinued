@@ -78,8 +78,8 @@ class ContMainMenu(QtWidgets.QMainWindow):
 
             elif item.text(column) == "Property":
                 #Property
-                import controllers.contProperty
-                self.__subWindow = controllers.contProperty.ContProperty(self)
+                import controllers.contProperty_TabCont
+                self.__subWindow = controllers.contProperty_TabCont.ContProperty_TabCont(self)
                 self.__ui.mdiArea.addSubWindow(self.__subWindow)
                 windowsLst = self.__ui.mdiArea.subWindowList()
                 windowsLst[len(windowsLst) - 1].resize(700,600)

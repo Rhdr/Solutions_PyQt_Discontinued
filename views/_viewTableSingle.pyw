@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'viewSingleTable.ui'
+# Form implementation generated from reading ui file '_viewTableSingle.ui'
 #
 # Created by: PyQt5 UI code generator 5.11.2
 #
@@ -79,17 +79,23 @@ class Ui_MainWindow(object):
         icon6.addPixmap(QtGui.QPixmap(":/CRUD_S/icons/save.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionSave.setIcon(icon6)
         self.actionSave.setObjectName("actionSave")
-        self.actionFind = QtWidgets.QAction(MainWindow)
+        self.actionSearch = QtWidgets.QAction(MainWindow)
         icon7 = QtGui.QIcon()
         icon7.addPixmap(QtGui.QPixmap(":/CRUD_S/icons/search.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.actionFind.setIcon(icon7)
-        self.actionFind.setObjectName("actionFind")
+        self.actionSearch.setIcon(icon7)
+        self.actionSearch.setObjectName("actionSearch")
+        self.actionswitchView = QtWidgets.QAction(MainWindow)
+        icon8 = QtGui.QIcon()
+        icon8.addPixmap(QtGui.QPixmap(":/navigation/icons/form.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionswitchView.setIcon(icon8)
+        self.actionswitchView.setObjectName("actionswitchView")
         self.toolbNav.addAction(self.actionFirst)
         self.toolbNav.addAction(self.actionPrev)
         self.toolbNav.addAction(self.actionRecordNr)
         self.toolbNav.addAction(self.actionNext)
         self.toolbNav.addAction(self.actionLast)
         self.toolbNav.addAction(self.actionNewRecord)
+        self.toolbNav.addAction(self.actionswitchView)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -110,8 +116,10 @@ class Ui_MainWindow(object):
         self.actionDelete.setToolTip(_translate("MainWindow", "Delete Record/s"))
         self.actionSave.setText(_translate("MainWindow", "Save"))
         self.actionSave.setToolTip(_translate("MainWindow", "Save all Records"))
-        self.actionFind.setText(_translate("MainWindow", "Find"))
-        self.actionFind.setToolTip(_translate("MainWindow", "Find a record"))
+        self.actionSearch.setText(_translate("MainWindow", "Search"))
+        self.actionSearch.setToolTip(_translate("MainWindow", "Search for a record"))
+        self.actionswitchView.setText(_translate("MainWindow", "Switch to Form View"))
+        self.actionswitchView.setToolTip(_translate("MainWindow", "Change the view to Table or Form view"))
 
 import icons_rc
 

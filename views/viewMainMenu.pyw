@@ -553,7 +553,7 @@ class Ui_MainWindow(object):
         self.treeWidgetExitMenu.topLevelItem(0).setText(0, _translate("MainWindow", "Sign Out"))
         self.treeWidgetExitMenu.topLevelItem(1).setText(0, _translate("MainWindow", "Exit"))
         self.treeWidgetExitMenu.setSortingEnabled(__sortingEnabled)
-        self.lblAppHeader.setText(_translate("MainWindow", "Solutions Database"))
+        self.lblAppHeader.setText(_translate("MainWindow", "Solutions Group"))
         self.lblDBConnStatusLbl.setText(_translate("MainWindow", "Connection Status:"))
         self.lblDBConnStatus.setText(_translate("MainWindow", "Not Connected"))
         self.lblDBConnStatusWarning.setText(_translate("MainWindow", "Connection Error: Reattempting to Connect..."))
