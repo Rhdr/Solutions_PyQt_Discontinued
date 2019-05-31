@@ -1,1 +1,0 @@
-pyuic5 -x viewOwnersProperty.ui -o viewOwnersProperty.pyw

@@ -1,1 +1,0 @@
-pyuic5 -x _viewForm.ui -o _viewForm.pyw

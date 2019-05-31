@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['contLogin.py'],
-             pathex=['C:\\Python36\\Lib\\site-packages\\PyQt5\\Qt\\bin', 'c:\\python36\\p', 'C:\\python36\\lib\\site-packages\\PyQt5\\Qt\\plugins\\platforms\\', 'C:\\python36\\lib\\site-packages\\PyQt5\\Qt\\plugins\\imageformats', 'C:\\PythonWorkspace\\BackedUp\\SolutionsDB'],
+             pathex=['C:\\PythonWorkspace\\BackedUp\\SolutionsDB'],
              binaries=[],
              datas=[],
              hiddenimports=[],

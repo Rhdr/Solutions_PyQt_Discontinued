@@ -1,70 +1,88 @@
 from PyQt5 import QtSql, QtCore
 import mysql.connector
-
-class DBConnection(QtCore.QObject):
-    def __init__(self, parent):
-        super(DBConnection, self).__init__(parent)
-
-    __connectionOpen = False    #holds connection status open = True / closed = false
-    _db = QtSql.QSqlDatabase()
+class DBConnection(object):
+    '''
     def connect(self):
-        try:
-            #open connection if not already open
-            self.__isConnected() #refresh connection status & static conntionOpen variable
-            if DBConnection.__connectionOpen == False:
-                DBConnection._db = QtSql.QSqlDatabase.addDatabase("QMYSQL")
-                DBConnection._db.setHostName("localhost")  #192.168.2.5
-                DBConnection._db.setDatabaseName("solutionsdb")
-                DBConnection._db.setUserName("root")
-                DBConnection._db.setPassword("12345") #766Prop667
-                DBConnection.__connectionOpen = DBConnection._db.open()
-            return DBConnection.__connectionOpen
-
-        except:
-            DBConnection.__connectionOpen = False
-            print("Error:: An error occured handeling the __db object")
+        self._connName = "SolutionsDB_Conn"
+        if(QtSql.QSqlDatabase.contains(self._connName)):
+            # connection found
+            print("DB Connection Exist:", self._db.open())
+            return self._db.open()
+        else:
+            #connection not found
+            self._db = QtSql.QSqlDatabase.addDatabase("QODBC3", self._connName)
+            self._db.setHostName("127.0.0.1")  #192.168.2.5
+            self._db.setDatabaseName("SolutionsDB")
+            self._db.setUserName("sa")
+            self._db.setPassword("766Prop667")
             try:
-                print("LastError:", DBConnection._db.lastError().text())
-            except:
-                #intentionally left empty
-                pass
+                print("DB Connection Created:", self._db.open())
+                return self._db.open()
+            except Exception as e:
+                print("DB Connection Error:", self._db.lastError().text())
+                return False
+
+            #example Query
+            #q = QtSql.QSqlQuery("SELECT * FROM MyEntity", self._db)
+            #q.exec(self._connName)
 
     def closeConnection(self):
         try:
             print("Clossing DB Connection")
-            DBConnection._db.close()
-            DBConnection.__connectionOpen = False
+            self._db.close()
         except:
             #intentionally left blank
             pass
-
-    def __isConnected(self):
-        # refresh connection status & return if connected or not
-        try:
-            DBConnection.__connectionOpen = DBConnection._db.open()
-            return DBConnection.__connectionOpen
-        except:
-            DBConnection.__connectionOpen = False
-            return False
 
     def __del__(self):
         try:
+            print("Deleting DB Connection")
+            self._db.close()
+        except:
+            #intentionally left blank
+            pass
+
+    '''
+    _db = None
+    def connect(self):
+        try:
+            if DBConnection._db == None or (DBConnection._db.open() == False):
+                DBConnection._db = QtSql.QSqlDatabase.addDatabase("QODBC")
+                DBConnection._db.setHostName("127.0.0.1")  #192.168.2.5
+                DBConnection._db.setDatabaseName("SolutionsDB")
+                #DBConnection._db.setUserName("root")
+                #DBConnection._db.setPassword("12345") #766Prop667
+                print("DB Connection Created:", DBConnection._db.open())
+            return DBConnection._db.open()
+
+        except Exception as e:
+            print("DB Connection Error:", self._db.lastError().text())
+            return False
+
+    def closeConnection(self):
+        try:
+            print("DB Connection: Closing")
             DBConnection._db.close()
         except:
             #intentionally left blank
             pass
 
-def except_hook(cls, exception, traceback):
-    sys.__excepthook__(cls, exception, traceback)
+    def __del__(self):
+        try:
+            print("DB Connection: Deleting")
+            DBConnection._db.close()
+        except:
+            #intentionally left blank
+            pass
+
+
 if __name__ == "__main__":
     from PyQt5 import QtWidgets
     import sys
-    sys.excepthook = except_hook
     app = QtWidgets.QApplication(sys.argv)
-    p = QtWidgets.QWidget()
-    conn = DBConnection(p)
+
+    conn = DBConnection()
     conn.connect()
-    print("Connected: " + str(conn.connect()))
     conn.closeConnection()
 
     sys.exit(app.exec_())

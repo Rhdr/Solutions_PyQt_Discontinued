@@ -5,8 +5,8 @@
     <file>icons/tabs.png</file>
   </qresource>
   <qresource prefix="navigation">
-    <file>icons/form.png</file>
-    <file>icons/table.png</file>
+    <file>icons/SectionClosed.png</file>
+    <file>icons/SectionOpen.png</file>
     <file>icons/GoToFirstRecord.png</file>
     <file>icons/GoToLastRecord.png</file>
     <file>icons/GoToNextRecord.png</file>

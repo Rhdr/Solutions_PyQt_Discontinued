@@ -1,0 +1,1 @@
+pyuic5 -x viewMyEntity.ui -o viewMyEntity.pyw
