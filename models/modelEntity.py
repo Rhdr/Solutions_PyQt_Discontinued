@@ -1,6 +1,8 @@
 from PyQt5 import QtSql
+
 import models._databaseConnection
 import utilityClasses.TransactionSqlQueryModel
+
 
 class ModelEntity(models._databaseConnection.DBConnection):
     def __init__(self):

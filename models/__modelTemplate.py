@@ -1,5 +1,7 @@
 from PyQt5 import QtSql
+
 import models._databaseConnection
+
 
 class Model(models._databaseConnection.DBConnection):
     def getModel(self):

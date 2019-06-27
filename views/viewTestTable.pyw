@@ -8,6 +8,9 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+import icons_rc
+
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -112,7 +115,6 @@ class Ui_MainWindow(object):
         self.actionFind.setText(_translate("MainWindow", "Find"))
         self.actionFind.setToolTip(_translate("MainWindow", "Find a record"))
 
-import icons_rc
 
 if __name__ == "__main__":
     import sys

@@ -1,6 +1,8 @@
 from PyQt5 import QtWidgets, QtCore
-import views.viewTestTable
+
 import models.modelTestTable
+import views.viewTestTable
+
 
 class ContEntity(QtWidgets.QMainWindow):
     def __init__(self, parent):

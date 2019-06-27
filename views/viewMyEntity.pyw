@@ -8,6 +8,9 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+import icons_rc
+
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -134,7 +137,6 @@ class Ui_MainWindow(object):
         self.actionSave_Insert.setText(_translate("MainWindow", "Save New Record"))
         self.actionSave_Insert.setToolTip(_translate("MainWindow", "Save New Record"))
 
-import icons_rc
 
 if __name__ == "__main__":
     import sys

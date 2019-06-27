@@ -1,4 +1,5 @@
 from PyQt5 import QtSql, QtWidgets, QtCore, QtGui
+
 import utilityClasses.dataStructures
 
 

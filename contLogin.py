@@ -1,9 +1,11 @@
 from PyQt5 import QtWidgets, QtCore
-import views.viewLogin
+
 import controllers.contMainMenu
 import models._databaseConnection
-import utilityClasses.paletteFunctions
 import utilityClasses.keyboardFunctions
+import utilityClasses.paletteFunctions
+import views.viewLogin
+
 
 class ContLogin(QtWidgets.QDialog):
     def __init__(self, parent = None):

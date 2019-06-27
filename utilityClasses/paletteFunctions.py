@@ -1,4 +1,5 @@
 from PyQt5 import QtCore, QtGui
+
 class Pallet(QtGui.QPalette):
     def __init__(self, parent = None):
         QtGui.QPalette.__init__(self)

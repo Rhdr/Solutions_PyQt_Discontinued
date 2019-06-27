@@ -8,6 +8,9 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+import icons_rc
+
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -96,7 +99,6 @@ class Ui_MainWindow(object):
         self.actionLast.setToolTip(_translate("MainWindow", "Goto Last Record"))
         self.actionRecordCount.setText(_translate("MainWindow", "Record ... of ..."))
 
-import icons_rc
 
 if __name__ == "__main__":
     import sys

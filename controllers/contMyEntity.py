@@ -1,8 +1,10 @@
 from PyQt5 import QtWidgets, QtCore
-import views.viewMyEntity
-import views.viewInterface_Main
+
 import models.modelMyEntity
 import utilityClasses.delegates
+import views.viewInterface_Main
+import views.viewMyEntity
+
 
 class ContMyEntity(QtWidgets.QMainWindow):
     def __init__(self, parent):
@@ -45,6 +47,8 @@ class ContMyEntity(QtWidgets.QMainWindow):
         self.__uiInterfaceMain.actionNext.triggered.connect(self.actionNext)
         self.__uiInterfaceMain.actionLast.triggered.connect(self.actionLast)
         self.__uiInterfaceMain.tableView.installEventFilter(self)  # install event filter to catch delete events
+        
+        self.actionFirst()
 
     def actionFirst(self):
         self.__mapper.toFirst()

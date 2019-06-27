@@ -1,5 +1,7 @@
 from PyQt5 import QtWidgets, QtCore
+
 import views.
+
 
 class Cont(QtWidgets.QMainWindow):
     def __init__(self, parent = None):

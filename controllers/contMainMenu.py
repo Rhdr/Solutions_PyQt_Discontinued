@@ -1,8 +1,10 @@
 from PyQt5 import QtWidgets, QtCore
-import views.viewMainMenu
+
 import models._databaseConnection
 import utilityClasses.paletteFunctions
 import utilityClasses.utilityFunctions
+import views.viewMainMenu
+
 
 class ContMainMenu(QtWidgets.QMainWindow):
     def __init__(self, parent = None):

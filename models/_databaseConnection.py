@@ -1,4 +1,5 @@
 from PyQt5 import QtSql
+
 #import mysql.connector
 class DBConnection(object):
     _db = None

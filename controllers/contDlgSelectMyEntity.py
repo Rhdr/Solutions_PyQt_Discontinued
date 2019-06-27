@@ -1,6 +1,8 @@
 from PyQt5 import QtWidgets
-import views.viewDlgSelectMyEntity
+
 import models.modelMyEntity
+import views.viewDlgSelectMyEntity
+
 
 class ContDlgSelectMyEntity(QtWidgets.QDialog):
     def __init__(self, parent = None):

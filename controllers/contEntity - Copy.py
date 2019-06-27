@@ -1,9 +1,11 @@
 from PyQt5 import QtWidgets, QtCore
-import views.viewEntitySearch
-import views.viewEntity
-import views.viewInterface_Main
+
 import models.modelEntity
 import utilityClasses.delegates
+import views.viewEntity
+import views.viewEntitySearch
+import views.viewInterface_Main
+
 
 class ContEntity(QtWidgets.QMainWindow):
     def __init__(self, parent):

@@ -1,4 +1,5 @@
 from PyQt5 import QtWidgets, QtCore
+
 class QLineEditExt(QtWidgets.QLineEdit):
     gotFocus = QtCore.pyqtSignal()
     lostFocus = QtCore.pyqtSignal()

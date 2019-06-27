@@ -1,5 +1,7 @@
 from PyQt5 import QtWidgets
+
 import views.viewFindAccounts
+
 
 class ContFindAccounts(QtWidgets.QWidget):
     def __init__(self, parent):

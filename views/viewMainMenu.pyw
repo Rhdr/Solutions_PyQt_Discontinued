@@ -8,6 +8,9 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+import icons_rc
+
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -563,7 +566,6 @@ class Ui_MainWindow(object):
         self.actionMbiTabView.setText(_translate("MainWindow", "Tab View"))
         self.actionMbiTabView.setToolTip(_translate("MainWindow", "Switch From Windowed View to Tabbed View"))
 
-import icons_rc
 
 if __name__ == "__main__":
     import sys

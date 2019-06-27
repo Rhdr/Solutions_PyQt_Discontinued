@@ -1,14 +1,15 @@
-from utilityClasses.uiObjects import *
-# -*- coding: utf-8 -*-
+from PyQt5 import QtCore, QtGui, QtWidgets
 
+import icons_rc
+from utilityClasses.uiObjects import *
+
+
+# -*- coding: utf-8 -*-
 # Form implementation generated from reading ui file 'viewLogin.ui'
 #
 # Created by: PyQt5 UI code generator 5.6
 #
 # WARNING! All changes made in this file will be lost!
-
-from PyQt5 import QtCore, QtGui, QtWidgets
-
 class Ui_qdlgLogin(object):
     def setupUi(self, qdlgLogin):
         qdlgLogin.setObjectName("qdlgLogin")
@@ -370,7 +371,6 @@ class Ui_qdlgLogin(object):
         self.btnLogin.setToolTip(_translate("qdlgLogin", "Login to Soluitons Database"))
         self.btnLogin.setText(_translate("qdlgLogin", "Login"))
 
-import icons_rc
 
 if __name__ == "__main__":
     import sys
