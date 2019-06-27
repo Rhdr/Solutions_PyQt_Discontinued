@@ -1,9 +1,9 @@
 from PyQt5 import QtWidgets, QtCore
 
 import models.modelMyEntity
-import utilityClasses.delegates
-import views.viewInterface_Main
-import views.viewMyEntity
+import utilityClasses.delegates  
+import views.viewInterface_Main  
+import views.viewMyEntity 
 
 
 class ContMyEntity(QtWidgets.QMainWindow):
@@ -13,25 +13,29 @@ class ContMyEntity(QtWidgets.QMainWindow):
         #setup the two interfaces (__uiInterfaceMain & __uiMyEntity)
         self.__uiInterfaceMain = views.viewInterface_Main.Ui_MainWindow()
         self.__uiInterfaceMain.setupUi(self)
+        self.__uiInterfaceMain.lblTitle.setText("My Entities")
         subWindowEntity = QtWidgets.QMainWindow(self)
         self.__uiMyEntity = views.viewMyEntity.Ui_MainWindow()
         self.__uiMyEntity.setupUi(subWindowEntity)
-        self.__uiInterfaceMain.scrollArea_InsertEdit.setWidget(subWindowEntity)
         self.__uiMyEntity.btnSaveUpdate.hide()
+        self.__uiInterfaceMain.scrollArea_InsertEdit.setWidget(subWindowEntity)
         subWindowEntity.show()
 
-        #create entity object & load model
+        #create entity object & load models
         self.__myEntity = models.modelMyEntity.MyEntity()
-        self.__model = self.__myEntity.getModel()
-        self.__uiInterfaceMain.tableView.setModel(self.__model)
-
-        #extract table's selection model
+        self.__modelSource = self.__myEntity.getModel()
+        self.__modelSortFilterProxy = QtCore.QSortFilterProxyModel()
+        self.__modelSortFilterProxy.setSourceModel(self.__modelSource)
+        self.__modelSortFilterProxy.sort(1, QtCore.Qt.AscendingOrder);
+        #self.__modelSortFilterProxy.setDynamicSortFilter(True)
+        self.__modelSortFilterProxy.setSortRole(QtCore.Qt.DisplayRole)
+        self.__uiInterfaceMain.tableView.setSortingEnabled(True)
+        self.__uiInterfaceMain.tableView.setModel(self.__modelSortFilterProxy)
         self.__tableSelectionModel = self.__uiInterfaceMain.tableView.selectionModel()
-        self.__tableSelectionModel.selectedRows()
 
         #create mapper
         self.__mapper = QtWidgets.QDataWidgetMapper()
-        self.__mapper.setModel(self.__model)
+        self.__mapper.setModel(self.__modelSortFilterProxy)
         self.__mapper.addMapping(self.__uiMyEntity.txtName, 1)
         self.__mapper.setSubmitPolicy(QtWidgets.QDataWidgetMapper.ManualSubmit)
 
@@ -77,6 +81,7 @@ class ContMyEntity(QtWidgets.QMainWindow):
         self.__uiMyEntity.txtName.clear()
         self.__uiMyEntity.btnSaveUpdate.hide()
         self.__uiMyEntity.btnSaveInsert.show()
+        self.__uiMyEntity.btnNew.hide()
 
     def saveInsertRecord(self):
         name = self.__uiMyEntity.txtName.text()
@@ -105,6 +110,11 @@ class ContMyEntity(QtWidgets.QMainWindow):
             self.__mapper.setCurrentIndex(currentRow)
             self.__uiMyEntity.btnSaveUpdate.show()
             self.__uiMyEntity.btnSaveInsert.hide()
+            self.__uiMyEntity.btnNew.show()
+            selectedRowNo = self.__tableSelectionModel.selectedRows()[0].row() + 1
+            #selectedRowNo = selectedRows
+            self.__uiInterfaceMain.actionRecordNr.setText("Record " + str(selectedRowNo) + 
+                                                           " of " + str(self.__modelSortFilterProxy.rowCount()))
             #print(currentRow, pk, name)
         except IndexError:
             pass #if the user select invalid indexes dont exec the code
@@ -138,7 +148,7 @@ class ContMyEntity(QtWidgets.QMainWindow):
             self.__myEntity.refreshModel()
 
             #select next row (if next row < than max/last rows then move to last row)
-            if (row < self.__model.rowCount()):
+            if (row < self.__modelSortFilterProxy.rowCount()):
                 qModelIndex = self.__uiInterfaceMain.tableView.model().index(row, 0);
                 self.__uiInterfaceMain.tableView.setCurrentIndex(qModelIndex)
             else:
@@ -217,12 +227,8 @@ class ContMyEntity(QtWidgets.QMainWindow):
 
     '''
 
-def except_hook(cls, exception, traceback):
-    sys.__excepthook__(cls, exception, traceback)
-
 if __name__ == "__main__":
     import sys
-    sys.excepthook = except_hook
     #logging.basicConfig(level = 'INFO', propagate = True)
 
     app = QtWidgets.QApplication(sys.argv)

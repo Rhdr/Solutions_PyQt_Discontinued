@@ -2,7 +2,6 @@ from PyQt5 import QtSql
 
 import models._databaseConnection
 
-
 class MyEntity(models._databaseConnection.DBConnection):
     def __init__(self):
         super(MyEntity, self).__init__()
