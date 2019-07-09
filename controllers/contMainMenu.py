@@ -63,7 +63,8 @@ class ContMainMenu(QtWidgets.QMainWindow):
                 #My Entity
                 print("My Entity Clicked")
                 import controllers.contMyEntity
-                self.__MyEntity = models.modelMyEntity.ModelMyEntity()
+                #import models.modelMyEntity
+                self.__MyEntity = models.modelMyEntity.MyEntity()
                 self.__subWindow = controllers.contMyEntity.ContMyEntity(self)
                 self.__ui.mdiArea.addSubWindow(self.__subWindow)
                 self.__subWindow.showNormal()

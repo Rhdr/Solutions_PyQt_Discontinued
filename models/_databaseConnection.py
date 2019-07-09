@@ -2,10 +2,11 @@ from PyQt5 import QtSql
 
 #import mysql.connector
 class DBConnection(object):
-    _db = None
-    def connect(self):
+    _db = QtSql.QSqlDatabase()
+    @staticmethod
+    def connect():
         try:
-            if DBConnection._db == None or (DBConnection._db.open() == False):
+            if (DBConnection._db.open() == False or DBConnection._db == None):
                 DBConnection._db = QtSql.QSqlDatabase.addDatabase("QODBC")
                 DBConnection._db.setHostName("127.0.0.1")  #192.168.2.5
                 DBConnection._db.setDatabaseName("SolutionsDB")
@@ -15,7 +16,7 @@ class DBConnection(object):
             return DBConnection._db.open()
 
         except Exception as e:
-            print("DB Connection Error:", self._db.lastError().text())
+            print("DB Connection Error:", DBConnection._db.lastError().text())
             return False
 
     def closeConnection(self):
@@ -28,8 +29,8 @@ class DBConnection(object):
 
     def __del__(self):
         try:
-            print("DB Connection: Deleting")
-            DBConnection._db.close()
+            print("DB Connection: Obj Deleted")
+            #DBConnection._db.close()
         except:
             #intentionally left blank
             pass

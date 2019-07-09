@@ -1,0 +1,3 @@
+[2019-Jul-08 12:17:08] [        loggingSetup.py] [           getLogger] [   INFO  30]: =======================================
+[2019-Jul-08 12:17:08] [        loggingSetup.py] [           getLogger] [   INFO  31]: New Log Entry into log: _objectSql
+[2019-Jul-08 12:17:08] [        loggingSetup.py] [           getLogger] [   INFO  32]: =======================================

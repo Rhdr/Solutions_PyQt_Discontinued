@@ -1,0 +1,35 @@
+[2019-Jul-05 14:17:06] [   loggingSetup.py] [      getLogger] [   INFO  31]: =======================================
+[2019-Jul-05 14:17:06] [   loggingSetup.py] [      getLogger] [   INFO  32]: New Log Entry into log: loggingSetup
+[2019-Jul-05 14:17:06] [   loggingSetup.py] [      getLogger] [   INFO  33]: =======================================
+[2019-Jul-05 14:17:06] [   loggingSetup.py] [      getLogger] [   INFO  31]: =======================================
+[2019-Jul-05 14:17:06] [   loggingSetup.py] [      getLogger] [   INFO  31]: =======================================
+[2019-Jul-05 14:17:06] [   loggingSetup.py] [      getLogger] [   INFO  32]: New Log Entry into log: loggingSetup
+[2019-Jul-05 14:17:06] [   loggingSetup.py] [      getLogger] [   INFO  32]: New Log Entry into log: loggingSetup
+[2019-Jul-05 14:17:06] [   loggingSetup.py] [      getLogger] [   INFO  33]: =======================================
+[2019-Jul-05 14:17:06] [   loggingSetup.py] [      getLogger] [   INFO  33]: =======================================
+[2019-Jul-05 14:17:06] [   loggingSetup.py] [       <module>] [  DEBUG  39]: Testing logger setup
+[2019-Jul-05 14:17:06] [   loggingSetup.py] [       <module>] [  DEBUG  39]: Testing logger setup
+[2019-Jul-05 14:25:54] [   loggingSetup.py] [      getLogger] [   INFO  30]: =======================================
+[2019-Jul-05 14:25:54] [   loggingSetup.py] [      getLogger] [   INFO  31]: New Log Entry into log: loggingSetup
+[2019-Jul-05 14:25:54] [   loggingSetup.py] [      getLogger] [   INFO  32]: =======================================
+[2019-Jul-05 14:25:54] [   loggingSetup.py] [       <module>] [  DEBUG  38]: Testing logger setup
+[2019-Jul-05 14:26:03] [   loggingSetup.py] [      getLogger] [   INFO  30]: =======================================
+[2019-Jul-05 14:26:03] [   loggingSetup.py] [      getLogger] [   INFO  31]: New Log Entry into log: loggingSetup
+[2019-Jul-05 14:26:03] [   loggingSetup.py] [      getLogger] [   INFO  32]: =======================================
+[2019-Jul-05 14:26:03] [   loggingSetup.py] [       <module>] [  DEBUG  38]: Testing logger setup
+[2019-Jul-05 15:08:02] [   loggingSetup.py] [      getLogger] [   INFO  30]: =======================================
+[2019-Jul-05 15:08:02] [   loggingSetup.py] [      getLogger] [   INFO  31]: New Log Entry into log: loggingSetup
+[2019-Jul-05 15:08:02] [   loggingSetup.py] [      getLogger] [   INFO  32]: =======================================
+[2019-Jul-05 15:08:02] [   loggingSetup.py] [       <module>] [  DEBUG  38]: Testing logger setup
+[2019-Jul-05 15:12:48] [   loggingSetup.py] [      getLogger] [   INFO  31]: =======================================
+[2019-Jul-05 15:12:48] [   loggingSetup.py] [      getLogger] [   INFO  32]: New Log Entry into log: loggingSetup
+[2019-Jul-05 15:12:48] [   loggingSetup.py] [      getLogger] [   INFO  33]: =======================================
+[2019-Jul-05 15:12:48] [   loggingSetup.py] [       <module>] [  DEBUG  39]: Testing logger setup
+[2019-Jul-08 08:43:11] [        loggingSetup.py] [           getLogger] [   INFO  33]: =======================================
+[2019-Jul-08 08:43:11] [        loggingSetup.py] [           getLogger] [   INFO  34]: New Log Entry into log: loggingSetup
+[2019-Jul-08 08:43:11] [        loggingSetup.py] [           getLogger] [   INFO  35]: =======================================
+[2019-Jul-08 08:43:11] [        loggingSetup.py] [            <module>] [  DEBUG  41]: Testing logger setup
+[2019-Jul-08 08:55:50] [        loggingSetup.py] [           getLogger] [   INFO  30]: =======================================
+[2019-Jul-08 08:55:50] [        loggingSetup.py] [           getLogger] [   INFO  31]: New Log Entry into log: loggingSetup
+[2019-Jul-08 08:55:50] [        loggingSetup.py] [           getLogger] [   INFO  32]: =======================================
+[2019-Jul-08 08:55:50] [        loggingSetup.py] [            <module>] [  DEBUG  38]: Testing logger setup

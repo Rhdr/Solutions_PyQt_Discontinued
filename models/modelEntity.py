@@ -59,12 +59,8 @@ class ModelEntity(models._databaseConnection.DBConnection):
                                   FROM entity
                                   WHERE entity.Name Like '%""" + searchVal + """%' OR entity.Surname Like '%""" + searchVal + """%' OR entity.Initials Like '%""" + searchVal + """%' OR entity.UserName Like '%""" + searchVal + """%'""")
 
-def except_hook(cls, exception, traceback):
-    sys.__excepthook__(cls, exception, traceback)
-
 if __name__ == "__main__":
     import sys
-    sys.excepthook = except_hook
     from PyQt5 import QtWidgets
     app = QtWidgets.QApplication(sys.argv)
 

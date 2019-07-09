@@ -1,0 +1,10 @@
+[2019-Jul-08 16:45:20] [        loggingSetup.py] [           getLogger] [   INFO  30]: =======================================
+[2019-Jul-08 16:45:20] [        loggingSetup.py] [           getLogger] [   INFO  31]: New Log Entry into log: modelMyEntity
+[2019-Jul-08 16:45:20] [        loggingSetup.py] [           getLogger] [   INFO  32]: =======================================
+[2019-Jul-08 16:45:20] [       modelMyEntity.py] [            __init__] [  DEBUG  13]: starting
+[2019-Jul-08 16:45:20] [       modelMyEntity.py] [            __init__] [   INFO  16]: object instantiated pk: 0 name:
+[2019-Jul-08 16:45:20] [       modelMyEntity.py] [            __init__] [  DEBUG  17]: completed
+[2019-Jul-08 16:45:20] [       modelMyEntity.py] [            getModel] [  DEBUG  43]: starting
+[2019-Jul-08 16:45:20] [       modelMyEntity.py] [        __setupModel] [  DEBUG  21]: starting
+[2019-Jul-08 16:45:20] [       modelMyEntity.py] [        __setupModel] [  DEBUG  32]: completed
+[2019-Jul-08 16:45:20] [       modelMyEntity.py] [            getModel] [  DEBUG  46]: completed returning: <PyQt5.QtSql.QSqlQueryModel object at 0x000001C2B6363318>
