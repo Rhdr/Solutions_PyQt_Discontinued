@@ -68,7 +68,7 @@
      </widget>
     </item>
     <item row="3" column="0">
-     <widget class="QPushButton" name="btnInsertEdit">
+     <widget class="QPushButton" name="btnDisplayInsertEdit">
       <property name="styleSheet">
        <string notr="true">Text-align:left</string>
       </property>
@@ -89,7 +89,7 @@
      </widget>
     </item>
     <item row="5" column="0">
-     <widget class="QPushButton" name="btnShowHideRecords">
+     <widget class="QPushButton" name="btnDisplayRecords">
       <property name="styleSheet">
        <string notr="true">Text-align:left</string>
       </property>

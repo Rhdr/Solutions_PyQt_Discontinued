@@ -26,8 +26,8 @@ class MyEntity():
             logger.exception(MyEntity.__model.lastError().text())
             raise SyntaxError("modelMyEntity Sql query error: " + e)
         
-        lst = models._objectSql.ObjectSql.getMyEntity_HeaderLst()
-        for i, val in enumerate(lst):
+        headerLst = models._objectSql.ObjectSql.getMyEntity_HeaderLst()
+        for i, val in enumerate(headerLst):
             MyEntity.__model.setHeaderData(i, QtCore.Qt.Horizontal, val)
         logger.debug("completed")
         
@@ -56,23 +56,36 @@ class MyEntity():
         logger.debug("completed")
     
     @staticmethod
-    def insertRecord(name):
-        logger.debug("starting")
+    def insertRecord(name, userName):
+        logger.debug("starting, name: %s, userName: %s" % (name, userName))
         models._databaseConnection.DBConnection().connect()
+        resultLst = []
         try:
             q = QtSql.QSqlQuery()
             q.prepare(models._objectSql.ObjectSql.getMyEntity_InsertSql())
             q.bindValue(":name", name)
+            q.bindValue(":userName", userName)
             q.exec()
             q.first()
-        except:
-            qErr = q.lastError().text()
-            logger.warning(qErr)
-            return [-1, qErr]
-        logger.info("inserted Record, name: " + str(name))
-        logger.debug("completed, lastInsertedId:" + str(q.value(0)) + " q.lastQuery(): " + str(q.lastQuery()))
-        return  [q.value(0), ""]
-    
+            
+            if q.lastError():
+                resultLst = [-1, str(q.lastError().text())] 
+                logger.exception(resultLst)
+            elif q.value(0) is None:
+                resultLst = [-1, "No result retrieved from the query"]
+                logger.exception(resultLst)
+            else:
+                resultLst = [q.value(0), ""]
+                logger.info("starting, name: %s, userName: %s" % (name, userName))
+            
+        except Exception as e:
+            raise Exception("Insert record could not execute:", e)
+            logger.exception()
+            resultLst = [-1, str(e)] 
+        finally:
+            logger.debug("completed, lastInsertedId: " + str(q.value(0)) + " q.lastQuery(): " + str(q.lastQuery()))
+            return resultLst
+        
     @staticmethod
     def updateRecord(pk, name):
         logger.debug("starting")

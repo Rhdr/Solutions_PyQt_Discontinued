@@ -35,7 +35,7 @@ class ObjectSql(object):
         #query returns lastInsertedID
         return """BEGIN TRANSACTION;
                         INSERT INTO Entity(Import_OldPk, Import_OldType, Name)
-                        SELECT 0, 0, :name AS Name;
+                        SELECT 0, 0, :name AS Name, :userName AS UserName;
                         DECLARE @lastInsertedID INT
                         SET @lastInsertedID =  SCOPE_IDENTITY();
                         INSERT INTO MyEntity(Pk_MyEntityID)
@@ -44,10 +44,10 @@ class ObjectSql(object):
                         COMMIT;"""
     @staticmethod
     def getMyEntity_HeaderLst():
-        return ["Pk_MyEntityID", "Entity Name"]
+        return ["Pk_MyEntityID", "Entity Name", "Entity Username"]
     @staticmethod
     def getMyEntity_SelectSql():
-        return """SELECT Pk_MyEntityID, Name 
+        return """SELECT Pk_MyEntityID, Name, Username
                     FROM MyEntity LEFT JOIN
                     Entity ON MyEntity.Pk_MyEntityID = Entity.Pk_EntityID;"""
     @staticmethod
@@ -59,7 +59,7 @@ class ObjectSql(object):
     @staticmethod
     def getMyEntity_UpdateSql():
         return """UPDATE entity
-                    SET Name = :name
+                    SET Name = :name, UserName = :userName
                     WHERE Pk_EntityID = :pk_EntityID;"""
     @staticmethod
     def getMyEntity_DeleteSql():

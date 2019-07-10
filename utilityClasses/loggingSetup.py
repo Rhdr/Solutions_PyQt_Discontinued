@@ -8,7 +8,8 @@ class Logger(object):
     logger = ""
     
     @staticmethod
-    def getLogger(__file_, logLvl = logging.DEBUG, logMode = "w"):
+    def getLogger(__file_, loggerOutput = 's', logLvl = logging.DEBUG, logMode = "w"):
+        """logger output s = stream only, f = file only, (else:*) b = both"""
         if Logger.logger == "":
             logName = str(os.path.basename(__file_))
             logName = logName.replace(".py", "")
@@ -24,8 +25,13 @@ class Logger(object):
             streamHandler = logging.StreamHandler()
             streamHandler.setFormatter(formatter)
         
-            Logger.logger.addHandler(fileHandler)
-            Logger.logger.addHandler(streamHandler)
+            if loggerOutput == 's':
+                Logger.logger.addHandler(streamHandler)
+            elif loggerOutput == 'f':
+                Logger.logger.addHandler(fileHandler)
+            else:
+                Logger.logger.addHandler(fileHandler)
+                Logger.logger.addHandler(streamHandler)
             
             Logger.logger.info("=======================================")
             Logger.logger.info("New Log Entry into log: " + logName)
@@ -33,7 +39,7 @@ class Logger(object):
         return Logger.logger
 
 if __name__ == "__main__":
-    logger = Logger.getLogger(__file__, logging.DEBUG, "a")
-    logger = Logger.getLogger(__file__, logging.DEBUG, "a") #trying to create a seccond logger of the same type (Shouldnt be created)
+    logger = Logger.getLogger(__file__, 's', logging.DEBUG, "a")
+    logger = Logger.getLogger(__file__, 's', logging.DEBUG, "a") #trying to create a seccond logger of the same type (Shouldnt be created)
     logger.debug("Testing logger setup")
     print("done")

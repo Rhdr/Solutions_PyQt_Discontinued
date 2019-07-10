@@ -54,8 +54,8 @@ class ContMyEntity(QtWidgets.QMainWindow):
         self.__uiMyEntity.btnSaveInsert.clicked.connect(self.saveInsertRecord)
         self.__uiMyEntity.btnSaveUpdate.clicked.connect(self.saveUpdateRecord)
         self.__uiInterfaceMain.tableView.clicked.connect(self.tableClicked)
-        self.__uiInterfaceMain.btnInsertEdit.clicked.connect(self.btnInsertEdit_Clicked)
-        self.__uiInterfaceMain.btnRecords.clicked.connect(self.btnRecords_Clicked)
+        self.__uiInterfaceMain.btnDisplayInsertEdit.clicked.connect(self.displayInsertEdit)
+        self.__uiInterfaceMain.btnDisplayRecords.clicked.connect(self.displayRecords)
         self.__uiInterfaceMain.actionFirst.triggered.connect(self.actionFirst)
         self.__uiInterfaceMain.actionPrev.triggered.connect(self.actionPrev)
         self.__uiInterfaceMain.actionNext.triggered.connect(self.actionNext)
@@ -172,15 +172,15 @@ class ContMyEntity(QtWidgets.QMainWindow):
     def saveInsertRecord(self,  newBlankRow = True, focusModelIndex = None):
         logger.debug("starting, newBlankRow:" + str(newBlankRow) + ", focusModelIndex:" + str(focusModelIndex))
         name = self.__uiMyEntity.txtName.text()
-        lastInsertedIdLst = models.modelMyEntity.MyEntity.insertRecord(name)
-        if focusModelIndex != None:
+        userName = self.__uiMyEntity.txtUserName.text()
+        lastInsertedIdLst = models.modelMyEntity.MyEntity.insertRecord(name, userName)
+        if focusModelIndex is not None:
             newPk = focusModelIndex.data(QtCore.Qt.DisplayRole)
-            print("newPk:", newPk)
         if lastInsertedIdLst[0] >= 0:
             #record inserted
             self.__dirty = False
             models.modelMyEntity.MyEntity.refreshModel()            
-            self.displayStatus("*A new record have been inserted: " + name)
+            self.displayStatus("*A new record have been inserted: " + name + ", " + userName)
             if focusModelIndex == None:
                 self.__uiInterfaceMain.tableView.setCurrentIndex(self.findModelValue(lastInsertedIdLst[0]))
             else:
@@ -190,9 +190,9 @@ class ContMyEntity(QtWidgets.QMainWindow):
             self.__uiMyEntity.txtName.setFocus()
         else:
             #failed to insert
-            QtWidgets.QMessageBox(QtWidgets.QMessageBox.Warning, 
-                                  "Could not save", "Could not save: " + str(lastInsertedIdLst[1]), 
-                                  QtWidgets.QMessageBox.Ok).exec()
+            QtWidgets.QMessageBox.warning(self, "Save Error", 
+                                          "Could not save the record: " + str(lastInsertedIdLst[1]), 
+                                          QtWidgets.QMessageBox.Ok)
         logger.debug("completed")
 
     def saveUpdateRecord(self, newBlankRow = True, focusModelIndex = None):
@@ -203,8 +203,8 @@ class ContMyEntity(QtWidgets.QMainWindow):
         name = self.__uiMyEntity.txtName.text()
         if focusModelIndex != None:
             newPk = focusModelIndex.data(QtCore.Qt.DisplayRole)
-        lastUpdatedId = models.modelMyEntity.MyEntity.updateRecord(pk, name)
-        if lastUpdatedId[0] >= 0:
+        lastUpdatedIdLst = models.modelMyEntity.MyEntity.updateRecord(pk, name)
+        if lastUpdatedIdLst[0] >= 0:
             #record updated
             self.__dirty = False        
             models.modelMyEntity.MyEntity.refreshModel()
@@ -218,9 +218,8 @@ class ContMyEntity(QtWidgets.QMainWindow):
             self.__uiMyEntity.txtName.setFocus()
         else:
             #failed to update
-            QtWidgets.QMessageBox(QtWidgets.QMessageBox.Warning, 
-                                  "Could not save", "Could not save: " + lastUpdatedId[1], 
-                                  QtWidgets.QMessageBox.Ok).exec()
+            QtWidgets.QMessageBox.warning(self, "Save Error", "Could not save the record: " + 
+                                          str(lastUpdatedIdLst[1]), QtWidgets.QMessageBox.Ok)
         logger.debug("completed")
     
     def findModelValue(self, val, row = 0, col = 0):
@@ -235,14 +234,13 @@ class ContMyEntity(QtWidgets.QMainWindow):
     def __currentRowChanged(self, current, previous):
         logger.debug("starting. current: " + str(current) + " previous: " + str(previous))
         if self.__dirty == True:
-            reply = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Warning, "Confirm Save",
+            msgReply = QtWidgets.QMessageBox.warning(self,  "Confirm Save",
                                "Do you wish to Save the changes?",
-                               QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No | QtWidgets.QMessageBox.Cancel, self).exec()
-            if reply == QtWidgets.QMessageBox.Yes:
+                               QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No | QtWidgets.QMessageBox.Cancel)
+            if msgReply == QtWidgets.QMessageBox.Yes:
                 logger.info("Save on RowChange: Yes")
-                print(current.indexes()[0].data(QtCore.Qt.DisplayRole))
                 self.save(False, current.indexes()[0])
-            elif reply == QtWidgets.QMessageBox.No:
+            elif msgReply == QtWidgets.QMessageBox.No:
                 logger.warning("Save on RowChange: No")
                 self.__dirty = False
             else:
@@ -266,24 +264,24 @@ class ContMyEntity(QtWidgets.QMainWindow):
         logger.debug("completed")
         
     #show hide InsertEdit section
-    def btnInsertEdit_Clicked(self):
+    def displayInsertEdit(self):
         logger.debug("starting")
-        if self.__uiInterfaceMain.btnInsertEdit.isChecked():
-            self.__uiInterfaceMain.btnInsertEdit.setChecked(True)
+        if self.__uiInterfaceMain.btnDisplayInsertEdit.isChecked():
+            self.__uiInterfaceMain.btnDisplayInsertEdit.setChecked(True)
             self.__uiInterfaceMain.scrollArea_InsertEdit.setMaximumHeight(16777215)
         else:
-            self.__uiInterfaceMain.btnInsertEdit.setChecked(False)
+            self.__uiInterfaceMain.btnDisplayInsertEdit.setChecked(False)
             self.__uiInterfaceMain.scrollArea_InsertEdit.setMaximumHeight(0)
         logger.debug("completed")
         
     #show hide CapturedRecords
-    def btnRecords_Clicked(self):
+    def displayRecords(self):
         logger.debug("starting")
-        if self.__uiInterfaceMain.btnRecords.isChecked():
-            self.__uiInterfaceMain.btnRecords.setChecked(True)
+        if self.__uiInterfaceMain.btnDisplayRecords.isChecked():
+            self.__uiInterfaceMain.btnDisplayRecords.setChecked(True)
             self.__uiInterfaceMain.scrollArea_CapturedRecords.setMaximumHeight(16777215)
         else:
-            self.__uiInterfaceMain.btnRecords.setChecked(False)
+            self.__uiInterfaceMain.btnDisplayRecords.setChecked(False)
             self.__uiInterfaceMain.scrollArea_CapturedRecords.setMaximumHeight(0)
         logger.debug("completed")
     
@@ -293,11 +291,10 @@ class ContMyEntity(QtWidgets.QMainWindow):
             #"Delete Key Pressed"
             selectedRows = self.__tableSelectionModel.selectedRows()
             logger.debug("starting, obj: " + str(obj) + " event: " + str(event) + " selectedRows: " + str(selectedRows))
-            msgbox = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Warning, "Confirm Deletion",
-                                           "You are about to delete " + str(len(selectedRows)) + " record(s). Are you sure you wish to delete the selected item(s)?",
-                                           QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.Cancel, self)
-            ret = msgbox.exec()
-            if ret == QtWidgets.QMessageBox.Yes:
+            msgReply = QtWidgets.QMessageBox.warning(self, "Confirm Deletion", "You are about to delete " + str(len(selectedRows)) + 
+                                                " record(s). Are you sure you wish to delete the selected item(s)?", 
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.Cancel)
+            if msgReply == QtWidgets.QMessageBox.Yes:
                 logger.debug("User about to delete selected records")
                 self.deleteRecords(selectedRows)
             logger.debug("completed")
@@ -328,14 +325,14 @@ class ContMyEntity(QtWidgets.QMainWindow):
         """On dirty save else just confirm exit"""
         logger.debug("starting, event: " + str(event))
         if self.__dirty:
-            reply = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Warning, "Confirm Save on Exit",
+            msgReply = QtWidgets.QMessageBox.warning(self, "Confirm Save on Exit",
                                            "Do you wish to Save before you exit?",
-                                           QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No | QtWidgets.QMessageBox.Cancel, self).exec()
-            if reply == QtWidgets.QMessageBox.Yes:
+                                           QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No | QtWidgets.QMessageBox.Cancel)
+            if msgReply == QtWidgets.QMessageBox.Yes:
                 logger.info("Save on Exit: Yes")
                 self.save()
                 event.accept()
-            elif reply == QtWidgets.QMessageBox.No:
+            elif msgReply == QtWidgets.QMessageBox.No:
                 logger.warning("Save on Exit: No")
                 event.accept()
             else:
@@ -344,10 +341,10 @@ class ContMyEntity(QtWidgets.QMainWindow):
                 
         else:
             #no need to save confirm exit
-            reply = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Question, "Confirm Exit",
+            msgReply = QtWidgets.QMessageBox.question(self, "Confirm Exit",
                                           "Are you sure you wish to close this window?", 
-                                          QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.Cancel, self).exec()
-            if reply == QtWidgets.QMessageBox.Yes:
+                                          QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.Cancel)
+            if msgReply == QtWidgets.QMessageBox.Yes:
                 event.accept()
                 logger.info("Exit: Yes")
             else:
